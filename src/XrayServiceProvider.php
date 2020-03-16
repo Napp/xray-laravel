@@ -21,7 +21,7 @@ class XrayServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/xray.php', 'xray');
         $this->registerFacade();
-        if (! config('xray.enabled')) {
+        if (! config('xray.enabled') || $this->app->runningInConsole() ) {
             return;
         }
 
@@ -37,7 +37,7 @@ class XrayServiceProvider extends ServiceProvider
     {
         $this->publishes([__DIR__ . '/../config/xray.php' => config_path('xray.php')]);
 
-        if (! config('xray.enabled')) {
+        if (! config('xray.enabled') || $this->app->runningInConsole()) {
             return;
         }
 
