@@ -26,9 +26,11 @@ class DatabaseQueryCollector extends EventsCollector
         if ($this->bindingsEnabled) {
             $sql = $this->parseBindings($sql, $bindings, $connection);
         }
+        
+        $backtrace = $this->getBacktrace();
         $this->current()->addSubsegment(
             (new SqlSegment())
-                ->setName($connection->getName())
+                ->setName($connection->getName() . ' at ' . $this->getCallerClass($backtrace))
                 ->setDatabaseType($connection->getDriverName())
                 ->setQuery($sql)
                 ->begin()

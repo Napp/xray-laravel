@@ -12,6 +12,8 @@ use Pkerrigan\Xray\Trace;
 
 class SegmentCollector
 {
+    use Backtracer;
+
     /** @var array */
     protected $segments;
 
