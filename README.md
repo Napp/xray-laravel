@@ -6,11 +6,39 @@ The package automatically trace your laravel application and sends to AWS X-Ray.
 
 ## Installation
 
-You can install the package via composer:
+1. Install the package via composer:
 
 ```bash
 composer require napp/xray-laravel
 ```
+
+2. Add middleware to the top of the global middleware in `App\Http\Kernel.php`
+
+```php
+protected $middleware = [
+    \Napp\Xray\Middleware\RequestTracing::class, // here
+
+    \App\Http\Middleware\TrustProxies::class,
+    \App\Http\Middleware\CheckForMaintenanceMode::class,
+    // ...
+];
+```
+
+3. Add XrayServiceProvider to the very top of providers in `config/app.php`. 
+
+```php
+'providers' => [
+    /*
+     * Laravel Framework Service Providers...
+     */
+    Napp\Xray\XrayServiceProvider::class, // here
+    Illuminate\Auth\AuthServiceProvider::class,
+    Illuminate\Broadcasting\BroadcastServiceProvider::class,
+    // ...
+];
+```
+
+## Disable Tracer
 
 If you want to disable the Tracer, just add to `.env`
 
@@ -18,7 +46,8 @@ If you want to disable the Tracer, just add to `.env`
 XRAY_ENABLED=false
 ```
 
-## What Tracing is supported
+
+## What Tracers are supported
 
 - [x] Composer autoload
 - [x] Framework boot

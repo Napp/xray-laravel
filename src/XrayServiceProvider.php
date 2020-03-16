@@ -43,19 +43,9 @@ class XrayServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->registerMiddleware();
         $this->registerCollectors();
     }
 
-    /**
-     * Add the middleware to the very top of the list,
-     * aiming to have better time measurements.
-     */
-    protected function registerMiddleware(): void
-    {
-        $kernel = $this->app->make(Kernel::class);
-        $kernel->prependMiddleware(RequestTracing::class);
-    }
 
     /**
      * Register collectors and start listening for events.
