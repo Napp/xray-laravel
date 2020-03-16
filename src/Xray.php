@@ -35,4 +35,9 @@ class Xray
     {
         $this->collector->submitHttpTracer($response);
     }
+
+    public function submitCliTracer(): void
+    {
+        $this->collector->submitCliTracer();
+    }
 }

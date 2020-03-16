@@ -8,6 +8,9 @@ class FrameworkCollector extends EventsCollector
 {
     public function registerEventListeners(): void
     {
+        if (! $this->app->runningInConsole()) {
+            $this->initHttpTracer($this->app['request']);
+        }
         // Application and Laravel startup times
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : microtime(true);
         $this->addSegment('composer autoload', $startTime);

@@ -45,10 +45,6 @@ class SegmentCollector
             ->setUrl($request->url())
             ->setMethod($request->method());
 
-        if (Auth::check()) {
-            $tracer->setUser((string)Auth::user()->getAuthIdentifier());
-        }
-
         $tracer->begin();
     }
 
@@ -65,10 +61,6 @@ class SegmentCollector
             ->addMetadata('framework', 'Laravel')
             ->addMetadata('framework_version', app()->version())
             ->setUrl($name);
-
-        if (Auth::check()) {
-            $tracer->setUser((string)Auth::user()->getAuthIdentifier());
-        }
 
         $tracer->begin();
     }
@@ -123,9 +115,24 @@ class SegmentCollector
     public function submitHttpTracer($response): void
     {
         $submitterClass = config('xray.submitter');
-        $this->tracer()
-            ->end()
+        $tracer = $this->tracer();
+
+        if (Auth::check()) {
+            $tracer->setUser((string)Auth::user()->getAuthIdentifier());
+        }
+        $tracer->end()
             ->setResponseCode($response->getStatusCode())
             ->submit(new $submitterClass());
+    }
+
+    public function submitCliTracer(): void
+    {
+        $submitterClass = config('xray.submitter');
+        $tracer = $this->tracer();
+
+        if (Auth::check()) {
+            $tracer->setUser((string)Auth::user()->getAuthIdentifier());
+        }
+        $tracer->end()->submit(new $submitterClass());
     }
 }

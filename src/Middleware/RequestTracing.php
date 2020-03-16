@@ -28,7 +28,7 @@ class RequestTracing
      */
     public function handle($request, Closure $next)
     {
-        $this->xray->initHttpTracer($request);
+        //$this->xray->initHttpTracer($request);
 
         return $next($request);
     }

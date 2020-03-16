@@ -51,6 +51,7 @@ class JobCollector extends EventsCollector
         if ($this->hasAddedSegment($this->getJobId($job))) {
             $this->getSegment($this->getJobId($job))->setResult($failed);
             $this->endSegment($this->getJobId($job));
+            $this->submitCliTracer();
         }
     }
 }
