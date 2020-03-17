@@ -4,6 +4,12 @@
 
 The package automatically trace your laravel application and sends to AWS X-Ray.
 
+![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-timeline.png)
+
+You can even inspect your DB query stack trace
+
+![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/lambda-db-stack.png)
+
 ## Installation
 
 1. Install the package via composer:
@@ -37,6 +43,11 @@ protected $middleware = [
     // ...
 ];
 ```
+
+4. Head over to AWS Console, to Lambda and find your function. Activate X-Ray Tracing.
+
+![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/lambda-enable-xray.png)
+
 
 ## Disable Tracer
 
