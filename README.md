@@ -51,6 +51,7 @@ XRAY_ENABLED=false
 
 - [x] Composer autoload
 - [x] Framework boot
+- [x] Route matching
 - [x] HTTP requests
 - [x] Database queries
 - [x] Queue jobs

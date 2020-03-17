@@ -42,8 +42,10 @@ class SegmentCollector
         $tracer = $this->tracer()
             ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
             ->setName(config('app.name') . ' HTTP')
-            ->addMetadata('framework', 'Laravel')
-            ->addMetadata('framework_version', app()->version())
+            ->setClientIpAddress($request->getClientIp())
+            ->addAnnotation('Framework', 'Laravel ' . app()->version())
+            ->addAnnotation('PHP Version', PHP_VERSION)
+
             ->setUrl($request->url())
             ->setMethod($request->method());
 
@@ -58,18 +60,22 @@ class SegmentCollector
 
         $this->segments = [];
         $tracer = $this->tracer()
-            ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
+            //->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
             ->setName(config('app.name') . ' CLI')
-            ->addMetadata('framework', 'Laravel')
-            ->addMetadata('framework_version', app()->version())
+            ->addAnnotation('framework', 'Laravel ' . app()->version())
             ->setUrl($name);
 
         $tracer->begin();
     }
 
-    public function addSegment(string $name, ?float $startTime = null): Segment
+    public function addSegment(string $name, ?float $startTime = null, ?array $metadata = null): Segment
     {
         $segment = (new TimeSegment())->setName($name);
+
+        if (null !== $metadata) {
+           $segment->addMetadata('info', $metadata);
+        }
+
         $this->current()->addSubsegment($segment);
         $segment->begin($startTime);
         $this->segments[$name] = $segment;

@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace Napp\Xray;
 
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use Napp\Xray\Collectors\DatabaseQueryCollector;
 use Napp\Xray\Collectors\FrameworkCollector;
 use Napp\Xray\Collectors\JobCollector;
-use Napp\Xray\Middleware\RequestTracing;
+use Napp\Xray\Collectors\RouteCollector;
 
 class XrayServiceProvider extends ServiceProvider
 {
@@ -26,6 +25,7 @@ class XrayServiceProvider extends ServiceProvider
         }
 
         app(FrameworkCollector::class);
+        app(RouteCollector::class);
     }
 
     /**
