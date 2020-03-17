@@ -66,6 +66,7 @@ XRAY_ENABLED=false
 - [x] HTTP requests
 - [x] Database queries
 - [x] Queue jobs
+- [x] Blade view render
 
 
 ## LICENSE

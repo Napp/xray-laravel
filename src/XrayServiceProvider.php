@@ -8,6 +8,7 @@ use Napp\Xray\Collectors\DatabaseQueryCollector;
 use Napp\Xray\Collectors\FrameworkCollector;
 use Napp\Xray\Collectors\JobCollector;
 use Napp\Xray\Collectors\RouteCollector;
+use Napp\Xray\Collectors\ViewCollector;
 
 class XrayServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,7 @@ class XrayServiceProvider extends ServiceProvider
 
         app(FrameworkCollector::class);
         app(RouteCollector::class);
+        app(ViewCollector::class);
     }
 
     /**
