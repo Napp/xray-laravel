@@ -4,11 +4,11 @@
 
 The package automatically trace your laravel application and sends to AWS X-Ray.
 
-![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-timeline.png)
+![timeline](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-timeline.png)
 
-You can even inspect your DB query stack trace
+Each element has extra information, such as the database query stack trace. 
 
-![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/lambda-db-stack.png)
+![db-stack](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-db-stack.png)
 
 ## Installation
 
@@ -38,6 +38,7 @@ protected $middleware = [
      * Laravel Framework Service Providers...
      */
     Napp\Xray\XrayServiceProvider::class, // here
+
     Illuminate\Auth\AuthServiceProvider::class,
     Illuminate\Broadcasting\BroadcastServiceProvider::class,
     // ...
@@ -57,7 +58,6 @@ If you want to disable the Tracer, just add to `.env`
 XRAY_ENABLED=false
 ```
 
-
 ## What Tracers are supported
 
 - [x] Composer autoload
@@ -66,11 +66,6 @@ XRAY_ENABLED=false
 - [x] HTTP requests
 - [x] Database queries
 - [x] Queue jobs
-
-## Not supported yet
-
-- [ ] Exceptions
-- [ ] Blade render
 
 
 ## LICENSE
