@@ -26,7 +26,7 @@ class APISegmentSubmitter implements SegmentSubmitter
                 config('xray.aws.secret'),
                 null,
                 now()->addDay()->unix()
-            )
+            ),
         ]);
     }
 
@@ -35,8 +35,7 @@ class APISegmentSubmitter implements SegmentSubmitter
         $this->client->putTraceSegments([
             'TraceSegmentDocuments' => [
                 json_encode($segment->jsonSerialize()),
-            ]
+            ],
         ]);
     }
-
 }

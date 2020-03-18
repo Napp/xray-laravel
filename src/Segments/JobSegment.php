@@ -33,7 +33,7 @@ class JobSegment extends Segment
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function jsonSerialize()
     {
@@ -41,7 +41,7 @@ class JobSegment extends Segment
 
         $data['job'] = array_filter([
             'payload' => $this->payload,
-            'result' => $this->result ? 'success' : 'failed'
+            'result' => $this->result ? 'success' : 'failed',
         ]);
 
         return $data;

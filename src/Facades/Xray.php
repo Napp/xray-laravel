@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 class Xray extends Facade
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected static function getFacadeAccessor()
     {

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Napp\Xray\Collectors;
 
 use Illuminate\Support\Facades\Auth;
-use Napp\Xray\Segments\Trace;
-use Symfony\Component\HttpFoundation\Request;
 use Napp\Xray\Segments\TimeSegment;
+use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\Segment;
+use Symfony\Component\HttpFoundation\Request;
 
 class SegmentCollector
 {
@@ -71,7 +71,7 @@ class SegmentCollector
         $segment = (new TimeSegment())->setName($name);
 
         if (null !== $metadata) {
-           $segment->addMetadata('info', $metadata);
+            $segment->addMetadata('info', $metadata);
         }
 
         $this->current()->addSubsegment($segment);
@@ -124,7 +124,7 @@ class SegmentCollector
         $tracer = $this->tracer();
 
         if (Auth::check()) {
-            $tracer->setUser((string)Auth::user()->getAuthIdentifier());
+            $tracer->setUser((string) Auth::user()->getAuthIdentifier());
         }
         $tracer->end()
             ->setResponseCode($response->getStatusCode())
@@ -137,7 +137,7 @@ class SegmentCollector
         $tracer = $this->tracer();
 
         if (Auth::check()) {
-            $tracer->setUser((string)Auth::user()->getAuthIdentifier());
+            $tracer->setUser((string) Auth::user()->getAuthIdentifier());
         }
         $tracer->end()->submit(new $submitterClass());
 
