@@ -59,7 +59,6 @@ class SegmentCollector
 
         $this->segments = [];
         $tracer = $this->tracer()
-            //->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
             ->setName(config('app.name') . ' CLI')
             ->addAnnotation('framework', 'Laravel ' . app()->version())
             ->setUrl($name);
