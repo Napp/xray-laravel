@@ -25,15 +25,15 @@ class JobCollector extends EventsCollector
         });
 
         $this->app['events']->listen(JobProcessed::class, function (JobProcessed $event) {
-            $this->handleJobEnded($event->job);
+            $this->handleJobEnded($event->job, true);
         });
 
         $this->app['events']->listen(JobFailed::class, function (JobFailed $event) {
-            $this->handleJobEnded($event->job, true);
+            $this->handleJobEnded($event->job, false);
         });
 
         $this->app['events']->listen(JobExceptionOccurred::class, function (JobExceptionOccurred $event) {
-            $this->handleJobEnded($event->job, true);
+            $this->handleJobEnded($event->job, false);
         });
     }
 
@@ -46,10 +46,10 @@ class JobCollector extends EventsCollector
         return sha1($job->getRawBody());
     }
 
-    public function handleJobEnded(Job $job, ?bool $failed = false): void
+    public function handleJobEnded(Job $job, bool $success = false): void
     {
         if ($this->hasAddedSegment($this->getJobId($job))) {
-            $this->getSegment($this->getJobId($job))->setResult($failed);
+            $this->getSegment($this->getJobId($job))->setResult($success);
             $this->endSegment($this->getJobId($job));
             $this->submitCliTracer();
         }
