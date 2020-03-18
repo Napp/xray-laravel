@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Napp\Xray;
@@ -48,7 +49,6 @@ class XrayServiceProvider extends ServiceProvider
         $this->registerCollectors();
     }
 
-
     /**
      * Register collectors and start listening for events.
      */
@@ -72,5 +72,4 @@ class XrayServiceProvider extends ServiceProvider
             return $app->make(Xray::class);
         });
     }
-
 }

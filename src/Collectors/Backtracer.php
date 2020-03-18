@@ -23,13 +23,13 @@ trait Backtracer
     public function getCallerClass(array $backtrace): string
     {
         $arr = explode('\\', $backtrace[0]);
+
         return end($arr);
     }
 
-
     protected function parseTrace($index, array $trace)
     {
-        if (isset($trace['class']) && !$this->isExcludedClass($trace['class'])) {
+        if (isset($trace['class']) && ! $this->isExcludedClass($trace['class'])) {
             return $trace['class'] . ':' . ($trace['line'] ?? '?');
         }
 
@@ -53,6 +53,4 @@ trait Backtracer
 
         return false;
     }
-
-
 }

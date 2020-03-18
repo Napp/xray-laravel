@@ -26,7 +26,7 @@ class DatabaseQueryCollector extends EventsCollector
         if ($this->bindingsEnabled) {
             $sql = $this->parseBindings($sql, $bindings, $connection);
         }
-        
+
         $backtrace = $this->getBacktrace();
         $this->current()->addSubsegment(
             (new SqlSegment())
@@ -35,7 +35,7 @@ class DatabaseQueryCollector extends EventsCollector
                 ->setQuery($sql)
                 ->addMetadata('backtrace', $backtrace)
                 ->begin()
-                ->end($time/1000)
+                ->end($time / 1000)
         );
     }
 

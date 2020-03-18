@@ -52,7 +52,7 @@ class RouteCollector extends EventsCollector
             } else {
                 $controller = $controller[0] . '::' . $controller[1];
             }
-        } elseif (!is_string($controller)) {
+        } elseif (! is_string($controller)) {
             return null;
         }
 
