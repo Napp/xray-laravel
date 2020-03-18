@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Napp\Xray\Collectors;
 
 use Illuminate\Support\Facades\Auth;
+use Napp\Xray\Segments\Trace;
 use Symfony\Component\HttpFoundation\Request;
 use Napp\Xray\Segments\TimeSegment;
 use Pkerrigan\Xray\Segment;
-use Pkerrigan\Xray\Trace;
 
 class SegmentCollector
 {
@@ -141,5 +141,7 @@ class SegmentCollector
             $tracer->setUser((string)Auth::user()->getAuthIdentifier());
         }
         $tracer->end()->submit(new $submitterClass());
+
+        $tracer::flush();
     }
 }
