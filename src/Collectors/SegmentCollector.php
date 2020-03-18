@@ -45,7 +45,6 @@ class SegmentCollector
             ->setClientIpAddress($request->getClientIp())
             ->addAnnotation('Framework', 'Laravel ' . app()->version())
             ->addAnnotation('PHP Version', PHP_VERSION)
-
             ->setUrl($request->url())
             ->setMethod($request->method());
 
