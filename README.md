@@ -29,7 +29,7 @@ Each element has extra information, such as the database query stack trace.
 composer require napp/xray-laravel
 ```
 
-2. Add middleware to the top of the global middleware in `App\Http\Kernel.php`
+2. Add middleware to the top of the global middleware in `App\Http\Kernel.php`.
 
 ```php
 protected $middleware = [
@@ -56,14 +56,77 @@ protected $middleware = [
 ];
 ```
 
+Optionally, you can add the facade in `config/app.php`. 
+
+```php
+'aliases' => [
+    // ...
+    'Xray' => \Napp\Xray\Facades\Xray::class,
+],
+```
 4. Head over to AWS Console, to Lambda and find your function. Activate X-Ray Tracing.
 
 ![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/lambda-enable-xray.png)
 
 
+## Manually use the Tracer
+
+Lets say you want to trace a specific piece of your code to deeply understand the impact on performance.
+
+```php
+Xray::addSegment('MyCustomLogic');
+
+// run your code
+
+Xray::endSegment('MyCustomLogic');
+```
+
+Another use case is to inspect some heavy php side parsing of data.
+
+```php
+use Napp\Xray\Facades\Xray;
+
+class XMLParser
+{
+    public function handle($file)
+    {
+        // adding some metadata to the segment
+        Xray::addSegment('XMLParser', null, [
+            'file' => $file->name()
+        ]);
+        $this->parse($file);
+        Xray::endSegment('XMLParser');
+    }
+    
+    private function parse($xml): array 
+    {
+        Xray::addSegment('XMLParser parse');
+        $output = $this->getAttributeList();
+        // some more code
+        Xray::endSegment('XMLParser parse');
+
+        return $output;
+    }
+    
+    private function getAttributeList(): array 
+    {
+        Xray::addSegment('XMLParser getAttributeList');
+        // your code
+        Xray::endSegment('XMLParser getAttributeList');
+
+        return [];
+    }
+}
+```
+
+The above results in:
+
+![XML-example](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-xml-example.png)
+
+
 ## Disable Tracer
 
-If you want to disable the Tracer, just add to `.env`
+If you want to disable the Tracer, just add to the `.env` file.
 
 ```dotenv
 XRAY_ENABLED=false
