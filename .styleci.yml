@@ -1,0 +1,15 @@
+preset: laravel
+
+risky: false
+
+disabled:
+  - concat_without_spaces
+  - phpdoc_var_without_name
+
+enabled:
+  - concat_with_spaces
+  - phpdoc_annotation_without_dot
+
+finder:
+  exclude:
+  - "tests"
