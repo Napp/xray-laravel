@@ -32,7 +32,7 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
     }
 
     /**
-     * Get or create the Daemon submitter
+     * Get or create the Daemon submitter.
      *
      * @return SubmissionDaemonSegmentSubmitter
      */
