@@ -123,6 +123,24 @@ The above results in:
 
 ![XML-example](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-xml-example.png)
 
+## Daemon support
+
+The X-Ray daemon is automatically run in a Lambda environment. Use this over the default `Napp\Xray\Submission\APISegmentSubmitter` to relay requests to Amazon X-Ray.
+
+Firstly, publish the X-Ray config and then update the submitter in `config/xray.php` to `\Napp\Xray\Submission\DaemonSegmentSubmitter::class`
+
+```console
+php artisan vendor:publish --tag=xray-config
+```
+
+```php
+# config/xray.php
+...
+ 'submitter' => \Napp\Xray\Submission\DaemonSegmentSubmitter::class,
+...
+```
+
+The daemon submitter will pick up the `_AWS_XRAY_DAEMON_ADDRESS` `_AWS_XRAY_DAEMON_PORT`. These environment variables are injected for you if using a service like [Laravel Vapor](https://vapor.laravel.com/)
 
 ## Disable Tracer
 
