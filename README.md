@@ -64,7 +64,33 @@ Optionally, you can add the facade in `config/app.php`.
     'Xray' => \Napp\Xray\Facades\Xray::class,
 ],
 ```
-4. Head over to AWS Console, to Lambda and find your function. Activate X-Ray Tracing.
+
+4. Edit the AWS Execution role to include X-Ray permissions.
+
+Either add the preexisting policy from AWS `AWSXrayWriteOnlyAccess`, or create your own:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+                "xray:GetSamplingRules",
+                "xray:GetSamplingTargets",
+                "xray:GetSamplingStatisticSummaries"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+```
+
+5. Head over to AWS Console, to Lambda and find your function. Activate X-Ray Tracing.
 
 ![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/lambda-enable-xray.png)
 
