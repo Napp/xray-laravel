@@ -23,8 +23,9 @@ trait Backtracer
     public function getCallerClass(array $backtrace): string
     {
         $arr = explode('\\', $backtrace[0]);
-
-        return end($arr);
+        $callerString = end($arr);
+        $cleanCallerString = str_replace(':?', '', $callerString);
+        return $cleanCallerString;
     }
 
     protected function parseTrace($index, array $trace)
