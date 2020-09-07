@@ -25,6 +25,7 @@ trait Backtracer
         $arr = explode('\\', $backtrace[0]);
         $callerString = end($arr);
         $cleanCallerString = str_replace(':?', '', $callerString);
+
         return $cleanCallerString;
     }
 
