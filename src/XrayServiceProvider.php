@@ -57,8 +57,7 @@ class XrayServiceProvider extends ServiceProvider
         if (config('xray.job')) {
             app(JobCollector::class);
         }
-        
-        
+
         if (config('xray.view')) {
             app(ViewCollector::class);
         }
