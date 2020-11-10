@@ -50,7 +50,7 @@ return [
             'key' => env('AWS_XRAY_ACCESS_KEY_ID') ?? env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_XRAY_SECRET_ACCESS_KEY') ?? env('AWS_SECRET_ACCESS_KEY'),
             'token' => env('AWS_XRAY_TOKEN'),
-            'expires' => now()->addDay()->unix()
+            'expires' => now()->addDay()->unix(),
         ],
     ],
 ];
