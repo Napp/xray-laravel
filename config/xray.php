@@ -43,13 +43,13 @@ return [
     |--------------------------------------------------------------------------
     */
     'aws' => [
-        'region' => env('AWS_XRAY_REGION') ?? env('AWS_DEFAULT_REGION'),
-        'version' => env('AWS_XRAY_VERSION', 'latest'),
-        'signature_version' => env('AWS_XRAY_SIGNATURE_VERSION', 'v4'),
+        'region' => env('XRAY_AWS_REGION') ?? env('AWS_DEFAULT_REGION'),
+        'version' => env('XRAY_AWS_VERSION', 'latest'),
+        'signature_version' => env('XRAY_AWS_SIGNATURE_VERSION', 'v4'),
         'credentials' => [
-            'key' => env('AWS_XRAY_ACCESS_KEY_ID') ?? env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_XRAY_SECRET_ACCESS_KEY') ?? env('AWS_SECRET_ACCESS_KEY'),
-            'token' => env('AWS_XRAY_TOKEN'),
+            'key' => env('XRAY_AWS_ACCESS_KEY_ID') ?? env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('XRAY_AWS_SECRET_ACCESS_KEY') ?? env('AWS_SECRET_ACCESS_KEY'),
+            'token' => env('XRAY_AWS_TOKEN'),
             'expires' => now()->addDay()->unix(),
         ],
     ],
