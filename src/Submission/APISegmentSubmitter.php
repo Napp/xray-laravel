@@ -17,7 +17,9 @@ class APISegmentSubmitter implements SegmentSubmitter
 
     public function __construct()
     {
-        $this->client = new XRayClient(config('xray.aws'));
+        $config = config('xray.aws');
+        $config['credentials']['expires'] = now()->addDay()->unix();
+        $this->client = new XRayClient($config);
     }
 
     public function submitSegment(Segment $segment)
