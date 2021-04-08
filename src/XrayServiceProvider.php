@@ -25,10 +25,6 @@ class XrayServiceProvider extends ServiceProvider
         if (! config('xray.enabled')) {
             return;
         }
-
-        app(FrameworkCollector::class);
-        app(RouteCollector::class);
-        app(ViewCollector::class);
     }
 
     /**
@@ -60,6 +56,18 @@ class XrayServiceProvider extends ServiceProvider
 
         if (config('xray.job')) {
             app(JobCollector::class);
+        }
+
+        if (config('xray.view')) {
+            app(ViewCollector::class);
+        }
+
+        if (config('xray.route')) {
+            app(RouteCollector::class);
+        }
+
+        if (config('xray.framework')) {
+            app(FrameworkCollector::class);
         }
     }
 
