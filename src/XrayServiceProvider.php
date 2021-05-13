@@ -22,9 +22,6 @@ class XrayServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/xray.php', 'xray');
         $this->registerFacade();
-        if (! config('xray.enabled')) {
-            return;
-        }
     }
 
     /**
@@ -38,7 +35,7 @@ class XrayServiceProvider extends ServiceProvider
             $this->publishes([__DIR__ . '/../config/xray.php' => config_path('xray.php')], 'xray-config');
         }
 
-        if (! config('xray.enabled')) {
+        if (!config('xray.enabled')) {
             return;
         }
 
@@ -50,6 +47,10 @@ class XrayServiceProvider extends ServiceProvider
      */
     protected function registerCollectors(): void
     {
+        if (!$this->app->runningInConsole()) {
+            $this->app->xray->initHttpTracer($this->app['request']);
+        }
+
         if (config('xray.db_query') || $this->app->runningInConsole()) {
             app(DatabaseQueryCollector::class);
         }

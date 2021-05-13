@@ -1,7 +1,12 @@
 {
     "name": "napp/xray-laravel",
     "description": "AWS X-Ray for Laravel applications.",
-    "keywords": ["xray", "php", "tracing", "laravel"],
+    "keywords": [
+        "xray",
+        "php",
+        "tracing",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "ext-json": "*",
@@ -38,7 +43,7 @@
                 "Napp\\Xray\\XrayServiceProvider"
             ],
             "aliases": {
-                "Xray" : "Napp\\Xray\\Facades\\Xray"
+                "Xray": "Napp\\Xray\\Facades\\Xray"
             }
         }
     }
