@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Xray
 {
-    private $collector;
+    private SegmentCollector $collector;
 
     public function __construct(SegmentCollector $collector)
     {
@@ -63,14 +63,14 @@ class Xray
         $this->collector->endCurrentSegment();
     }
 
-    public function initHttpTracer(Request $request): void
+    public function initHttpTracer(TraceConfig $config): void
     {
-        $this->collector->initHttpTracer($request);
+        $this->collector->initHttpTracer($config);
     }
 
-    public function initCliTracer(string $name): void
+    public function initCliTracer(TraceConfig $config): void
     {
-        $this->collector->initCliTracer($name);
+        $this->collector->initCliTracer($config);
     }
 
     public function submitHttpTracer($response): void

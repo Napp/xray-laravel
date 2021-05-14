@@ -27,8 +27,8 @@ class DaemonSegmentSubmitter implements SegmentSubmitter
 
     public function __construct()
     {
-        $this->host = env('_AWS_XRAY_DAEMON_ADDRESS');
-        $this->port = (int) env('_AWS_XRAY_DAEMON_PORT');
+        $this->host = config('xray.daemon_host');
+        $this->port = (int) config('xray.daemon_port');
     }
 
     /**

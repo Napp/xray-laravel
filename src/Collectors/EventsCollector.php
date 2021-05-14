@@ -19,4 +19,6 @@ abstract class EventsCollector extends SegmentCollector
 
         $this->registerEventListeners();
     }
+
+    abstract public function registerEventListeners(): void;
 }

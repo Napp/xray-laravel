@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'enabled' => env('XRAY_ENABLED', true),
+    'enabled' => env('AWS_XRAY_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -15,48 +15,49 @@ return [
     |
     */
     'submitter' => \Napp\Xray\Submission\APISegmentSubmitter::class,
+    // 'submitter' => \Napp\Xray\Submission\DaemonSegmentSubmitter::class,
 
     /*
     |--------------------------------------------------------------------------
     | Enable Database Query
     |--------------------------------------------------------------------------
     */
-    'db_query' => env('XRAY_DB_QUERY', true),
+    'db_query' => env('AWS_XRAY_ENABLE_DB_QUERY', true),
 
     /*
     |--------------------------------------------------------------------------
     | Enable Database Query Bindings
     |--------------------------------------------------------------------------
     */
-    'db_bindings' => env('XRAY_DB_QUERY_BINDINGS', false),
+    'db_bindings' => env('AWS_XRAY_ENABLE_DB_QUERY_BINDINGS', false),
 
     /*
     |--------------------------------------------------------------------------
     | Trace Queue Jobs
     |--------------------------------------------------------------------------
     */
-    'job' => env('XRAY_JOB', true),
+    'job' => env('AWS_XRAY_ENABLE_JOB', true),
 
     /*
     |--------------------------------------------------------------------------
     | Trace Views
     |--------------------------------------------------------------------------
     */
-    'view' => env('XRAY_VIEW', true),
+    'view' => env('AWS_XRAY_ENABLE_VIEW', true),
 
     /*
     |--------------------------------------------------------------------------
     | Trace Routes
     |--------------------------------------------------------------------------
     */
-    'route' => env('XRAY_ROUTE', true),
+    'route' => env('AWS_XRAY_ENABLE_ROUTE', true),
 
     /*
     |--------------------------------------------------------------------------
     | Trace Routes
     |--------------------------------------------------------------------------
     */
-    'framework' => env('XRAY_FRAMEWORK', true),
+    'framework' => env('AWS_XRAY_ENABLE_FRAMEWORK', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -64,14 +65,22 @@ return [
     |--------------------------------------------------------------------------
     */
     'aws' => [
-        'region' => env('XRAY_AWS_REGION') ?? env('AWS_DEFAULT_REGION'),
-        'version' => env('XRAY_AWS_VERSION', 'latest'),
-        'signature_version' => env('XRAY_AWS_SIGNATURE_VERSION', 'v4'),
+        'region' => env('AWS_XRAY_REGION') ?? env('AWS_DEFAULT_REGION'),
+        'version' => env('AWS_XRAY_VERSION', 'latest'),
+        'signature_version' => env('AWS_XRAY_SIGNATURE_VERSION', 'v4'),
         'credentials' => [
-            'key' => env('XRAY_AWS_ACCESS_KEY_ID') ?? env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('XRAY_AWS_SECRET_ACCESS_KEY') ?? env('AWS_SECRET_ACCESS_KEY'),
-            'token' => env('XRAY_AWS_TOKEN'),
+            'key' => env('AWS_XRAY_ACCESS_KEY_ID') ?? env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_XRAY_SECRET_ACCESS_KEY') ?? env('AWS_SECRET_ACCESS_KEY'),
+            'token' => env('AWS_XRAY_TOKEN'),
             'expires' => '',
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Daemon, only needed if "DaemonSegmentSubmitter" submitter is chosen
+    |--------------------------------------------------------------------------
+    */
+    'daemon_host' => env('AWS_XRAY_DAEMON_HOST', '127.0.0.1'),
+    'daemon_port' => env('AWS_XRAY_DAEMON_PORT', '2000'),
 ];

@@ -10,13 +10,14 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Napp\Xray\Segments\JobSegment;
+use Napp\Xray\TraceConfig;
 
 class JobCollector extends EventsCollector
 {
     public function registerEventListeners(): void
     {
         $this->app['events']->listen(JobProcessing::class, function (JobProcessing $event) {
-            $this->initCliTracer($event->job->resolveName());
+            $this->initCliTracer(new TraceConfig(['service_name' => $event->job->resolveName()]));
 
             $this->addCustomSegment(
                 (new JobSegment())->setName($event->job->resolveName())->setPayload($event->job->payload()),
@@ -49,7 +50,7 @@ class JobCollector extends EventsCollector
     public function handleJobEnded(Job $job, bool $success = false): void
     {
         if ($this->hasAddedSegment($this->getJobId($job))) {
-            $this->getSegment($this->getJobId($job))->setResult($success);
+            $this->getSegment($this->getJobId($job))->setError($success);
             $this->endSegment($this->getJobId($job));
             $this->submitCliTracer();
         }

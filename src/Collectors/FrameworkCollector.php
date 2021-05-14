@@ -19,7 +19,7 @@ class FrameworkCollector extends EventsCollector
 
         $this->app->booted(function () {
             // avoid already booted, it will miss end time
-            $this->endSegment('composer autoload');
+            // $this->endSegment('composer autoload');
             $this->endSegment('laravel boot');
         });
     }

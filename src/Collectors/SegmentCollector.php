@@ -7,6 +7,7 @@ namespace Napp\Xray\Collectors;
 use Illuminate\Support\Facades\Auth;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
+use Napp\Xray\TraceConfig;
 use Pkerrigan\Xray\Segment;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,38 +33,39 @@ class SegmentCollector
         return (bool) config('xray.enabled');
     }
 
-    public function initHttpTracer(Request $request): void
+    public function initHttpTracer(TraceConfig $config): void
     {
-        if (! $this->isTracerEnabled()) {
+        if (!$this->isTracerEnabled()) {
             return;
         }
 
         $this->segments = [];
         $tracer = $this->tracer()
-            ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
-            ->setName(config('app.name') . ' HTTP')
-            ->setClientIpAddress($request->getClientIp())
-            ->addAnnotation('Framework', 'Laravel ' . app()->version())
-            ->addAnnotation('PHP Version', PHP_VERSION)
-            ->setUrl($request->url())
-            ->setMethod($request->method());
+            ->setTraceHeader($config->trace_id)
+            ->setName($config->service_name)
+            ->setClientIpAddress($config->client_ip)
+            ->setUrl($config->url)
+            ->setMethod($config->method);
 
-        $tracer->begin();
+        $config->setAnnotations($tracer);
+
+        $tracer->begin($config->sample_percentage);
     }
 
-    public function initCliTracer(string $name): void
+    public function initCliTracer(TraceConfig $config): void
     {
-        if (! $this->isTracerEnabled()) {
+        if (!$this->isTracerEnabled()) {
             return;
         }
 
         $this->segments = [];
         $tracer = $this->tracer()
-            ->setName(config('app.name') . ' CLI')
-            ->addAnnotation('framework', 'Laravel ' . app()->version())
-            ->setUrl($name);
+            ->setName($config->service_name)
+            ->setUrl($config->url);
 
-        $tracer->begin();
+        $config->setAnnotations($tracer);
+
+        $tracer->begin($config->sample_percentage);
     }
 
     public function addSegment(string $name, ?float $startTime = null, ?array $metadata = null): Segment
