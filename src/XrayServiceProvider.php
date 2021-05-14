@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Napp\Xray;
 
-use Illuminate\Support\ServiceProvider;
-use Napp\Xray\Collectors\DatabaseQueryCollector;
-use Napp\Xray\Collectors\FrameworkCollector;
+use Napp\Xray\TraceConfig;
 use Napp\Xray\Collectors\JobCollector;
-use Napp\Xray\Collectors\RouteCollector;
+use Illuminate\Support\ServiceProvider;
 use Napp\Xray\Collectors\ViewCollector;
+use Napp\Xray\Collectors\RouteCollector;
+use Napp\Xray\Collectors\FrameworkCollector;
+use Napp\Xray\Collectors\DatabaseQueryCollector;
 
 class XrayServiceProvider extends ServiceProvider
 {

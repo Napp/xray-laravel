@@ -32,7 +32,7 @@ class TraceConfig
      *
      * ['trace_id']            string, default: $_SERVER['HTTP_X_AMZN_TRACE_ID']
      *
-     * ['sample_percentage']   int, 0~100, default: 100
+     * ['sample_percentage']   int, 0~100, default: 100, when sampled, it will auto generate trace_id if not set
      *
      * ['annotations']         array, key/value pair
      *
@@ -49,7 +49,7 @@ class TraceConfig
         $this->client_ip = is_null($request) ? $options['client_ip'] : $request->getClientIp();
         $this->service_name = $options['service_name'] ?? config('app.name');
         $this->trace_id = $options['trace_id'] ?? $_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null;
-        $this->sample_pct = $options['sample_pct'] ?? 100;
+        $this->sample_percentage = $options['sample_percentage'] ?? 100;
         $this->annotations = $options['annotations'];
     }
 
