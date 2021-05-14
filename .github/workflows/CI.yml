@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: docker://oskarstark/php-cs-fixer-ga
+
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: php-actions/composer@v5
+    - uses: php-actions/phpunit@v2
