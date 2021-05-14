@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Napp\Xray;
 
-use Napp\Xray\TraceConfig;
 use Napp\Xray\Collectors\JobCollector;
 use Illuminate\Support\ServiceProvider;
 use Napp\Xray\Collectors\ViewCollector;
@@ -23,12 +22,6 @@ class XrayServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/xray.php', 'xray');
         $this->registerFacade();
-
-        if (!config('xray.enabled')) {
-            return;
-        }
-
-        $this->registerTracing();
     }
 
     /**
@@ -54,6 +47,8 @@ class XrayServiceProvider extends ServiceProvider
      */
     protected function registerCollectors(): void
     {
+        $this->registerTracing();
+
         if (config('xray.db_query') || $this->app->runningInConsole()) {
             app(DatabaseQueryCollector::class);
         }
@@ -69,6 +64,10 @@ class XrayServiceProvider extends ServiceProvider
         if (config('xray.route')) {
             app(RouteCollector::class);
         }
+
+        if (config('xray.framework')) {
+            app(FrameworkCollector::class);
+        }
     }
 
     /**
@@ -79,14 +78,9 @@ class XrayServiceProvider extends ServiceProvider
     protected function registerTracing(): void
     {
         if (!$this->app->runningInConsole()) {
-            $config = new TraceConfig(['request' => $this->app->request]);
             /** @var Xray */
             $xray = $this->app->xray;
-            $xray->initHttpTracer($config);
-        }
-
-        if (config('xray.framework')) {
-            app(FrameworkCollector::class);
+            $xray->initHttpTracer($this->app->request);
         }
     }
 

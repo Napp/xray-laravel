@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Napp\Xray;
 
+use Illuminate\Support\Facades\Request;
 use Napp\Xray\Collectors\SegmentCollector;
 use Pkerrigan\Xray\Segment;
 use Pkerrigan\Xray\Trace;
@@ -63,14 +64,14 @@ class Xray
         $this->collector->endCurrentSegment();
     }
 
-    public function initHttpTracer(TraceConfig $config): void
+    public function initHttpTracer(Request $request): void
     {
-        $this->collector->initHttpTracer($config);
+        $this->collector->initHttpTracer($request);
     }
 
-    public function initCliTracer(TraceConfig $config): void
+    public function initCliTracer(String $name): void
     {
-        $this->collector->initCliTracer($config);
+        $this->collector->initCliTracer($name);
     }
 
     public function submitHttpTracer($response): void
