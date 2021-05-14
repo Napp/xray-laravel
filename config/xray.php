@@ -14,8 +14,9 @@ return [
     | Supported classes: "APISegmentSubmitter", "DaemonSegmentSubmitter"
     |
     */
-    'submitter' => \Napp\Xray\Submission\APISegmentSubmitter::class,
-    // 'submitter' => \Napp\Xray\Submission\DaemonSegmentSubmitter::class,
+    'submitter' => is_null(env('AWS_XRAY_DAEMON_HOST'))
+        ? \Napp\Xray\Submission\APISegmentSubmitter::class
+        : \Napp\Xray\Submission\DaemonSegmentSubmitter::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -88,6 +89,6 @@ return [
     | Daemon, only needed if "DaemonSegmentSubmitter" submitter is chosen
     |--------------------------------------------------------------------------
     */
-    'daemon_host' => env('AWS_XRAY_DAEMON_HOST', '127.0.0.1'),
+    'daemon_host' => env('AWS_XRAY_DAEMON_HOST'),
     'daemon_port' => env('AWS_XRAY_DAEMON_PORT', '2000'),
 ];

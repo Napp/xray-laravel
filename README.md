@@ -33,7 +33,7 @@ composer require napp/xray-laravel
 
 ```php
 protected $middleware = [
-    \Napp\Xray\Middleware\RequestTracing::class, // here
+    \Napp\Xray\Middleware\RequestTracing::class, // here, help to close segment
 
     \App\Http\Middleware\TrustProxies::class,
     \App\Http\Middleware\CheckForMaintenanceMode::class,
@@ -48,7 +48,7 @@ protected $middleware = [
     /*
      * Laravel Framework Service Providers...
      */
-    Napp\Xray\XrayServiceProvider::class, // here
+    Napp\Xray\XrayServiceProvider::class, // here, help to open segment
 
     Illuminate\Auth\AuthServiceProvider::class,
     Illuminate\Broadcasting\BroadcastServiceProvider::class,
@@ -150,20 +150,9 @@ The above results in:
 
 The X-Ray daemon is automatically run in a Lambda environment. Use this over the default `Napp\Xray\Submission\APISegmentSubmitter` to relay requests to Amazon X-Ray.
 
-Firstly, publish the X-Ray config and then update the submitter in `config/xray.php` to `\Napp\Xray\Submission\DaemonSegmentSubmitter::class`
+Firstly, set up env `AWS_XRAY_DAEMON_HOST` and `AWS_XRAY_DAEMON_PORT` to switch submitter to `\Napp\Xray\Submission\DaemonSegmentSubmitter`
 
-```console
-php artisan vendor:publish --tag=xray-config
-```
-
-```php
-# config/xray.php
-...
- 'submitter' => \Napp\Xray\Submission\DaemonSegmentSubmitter::class,
-...
-```
-
-The daemon submitter will pick up the `AWS_XRAY_DAEMON_ADDRESS` `AWS_XRAY_DAEMON_PORT`. These environment variables are injected for you if using a service like [Laravel Vapor](https://vapor.laravel.com/)
+See more about [environment](#environment).
 
 ## Disable Tracer
 
@@ -182,6 +171,35 @@ AWS_XRAY_ENABLED=false
 -   [x] Database queries
 -   [x] Queue jobs
 -   [x] Blade view render
+
+## Environment
+
+These environment variables are injected for you if using a service like [Laravel Vapor](https://vapor.laravel.com/)
+
+-   `AWS_XRAY_ENABLED`, default: `true`
+-   `AWS_XRAY_ENABLE_DB_QUERY`, default: `true`
+-   `AWS_XRAY_ENABLE_DB_QUERY_BINDINGS`, default: `false`
+-   `AWS_XRAY_ENABLE_JOB`, default: `true`
+-   `AWS_XRAY_ENABLE_VIEW`, default: `true`
+-   `AWS_XRAY_ENABLE_ROUTE`, default: `true`
+-   `AWS_XRAY_ENABLE_FRAMEWORK`, default: `true`
+-   `AWS_XRAY_SAMPLE_RATE`, default: `100`
+    -   should between `1` to `100`
+    -   when not finding `HTTP_X_AMZN_TRACE_ID` in header, using this sample rate globally
+
+### Daemon
+
+-   `AWS_XRAY_DAEMON_HOST`
+-   `AWS_XRAY_DAEMON_PORT`, default: `2000`
+
+### API
+
+-   `AWS_XRAY_REGION`, default: `AWS_DEFAULT_REGION`
+-   `AWS_XRAY_VERSION`, default: `latest`
+-   `AWS_XRAY_SIGNATURE_VERSION`, default: `v4`
+-   `AWS_XRAY_ACCESS_KEY_ID`, default: `AWS_ACCESS_KEY_ID`
+-   `AWS_XRAY_SECRET_ACCESS_KEY`, default: `AWS_SECRET_ACCESS_KEY`
+-   `AWS_XRAY_TOKEN`
 
 ## LICENSE
 
