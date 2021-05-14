@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Napp\Xray\Collectors;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\Segment;
@@ -32,6 +32,11 @@ class SegmentCollector
         return (bool) config('xray.enabled');
     }
 
+    public function getSampleRate(): int
+    {
+        return (int) config('xray.sample_rate');
+    }
+
     public function initHttpTracer(Request $request): void
     {
         if (!$this->isTracerEnabled()) {
@@ -46,7 +51,7 @@ class SegmentCollector
             ->setUrl($request->url())
             ->setMethod($request->method());
 
-        $tracer->begin(config('xray.sample_rate'));
+        $tracer->begin($this->getSampleRate());
     }
 
     public function initCliTracer(string $name): void
@@ -60,7 +65,7 @@ class SegmentCollector
             ->setName(config('app.name') . ' CLI')
             ->setUrl($name);
 
-        $tracer->begin(config('xray.sample_rate'));
+        $tracer->begin($this->getSampleRate());
     }
 
     public function addSegment(string $name, ?float $startTime = null, ?array $metadata = null): Segment

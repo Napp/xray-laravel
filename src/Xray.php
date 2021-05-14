@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Napp\Xray;
 
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Napp\Xray\Collectors\SegmentCollector;
 use Pkerrigan\Xray\Segment;
 use Pkerrigan\Xray\Trace;
