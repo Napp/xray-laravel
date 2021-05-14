@@ -1,6 +1,7 @@
 # Aws X-Ray for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/napp/xray-laravel.svg?style=flat-square)](https://packagist.org/packages/napp/xray-laravel)
+![CI](https://github.com/104corp/xray-laravel/actions/workflows/CI.yml/badge.svg)
 
 The package automatically trace your laravel application and sends to [AWS X-Ray](https://aws.amazon.com/xray).
 
