@@ -9,13 +9,20 @@ use Illuminate\Http\Request;
 
 class TraceConfig
 {
-    public string $url;
-    public string $method;
-    public string $client_ip;
-    public string $trace_id;
-    public string $service_name;
-    public int $sample_percentage;
-    protected array $annotations;
+    /** @var string */
+    public $url;
+    /** @var string */
+    public $method;
+    /** @var string */
+    public $client_ip;
+    /** @var string */
+    public $trace_id;
+    /** @var string */
+    public $service_name;
+    /** @var int */
+    public $sample_percentage;
+    /** @var array */
+    protected $annotations;
 
     /**
      * Build config for tracing
@@ -61,7 +68,9 @@ class TraceConfig
      */
     public function setAnnotations(Trace $trace): void
     {
-        if (is_null($this->annotations)) return;
+        if (is_null($this->annotations)) {
+            return;
+        }
 
         /** @var String */
         foreach ($this->annotations as $key => $value) {

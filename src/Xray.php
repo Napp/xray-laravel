@@ -7,11 +7,11 @@ namespace Napp\Xray;
 use Napp\Xray\Collectors\SegmentCollector;
 use Pkerrigan\Xray\Segment;
 use Pkerrigan\Xray\Trace;
-use Symfony\Component\HttpFoundation\Request;
 
 class Xray
 {
-    private SegmentCollector $collector;
+    /** @var SegmentCollector */
+    private $collector;
 
     public function __construct(SegmentCollector $collector)
     {
