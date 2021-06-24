@@ -32,10 +32,11 @@ class DatabaseQueryCollector extends EventsCollector
         $backtrace = $this->getBacktrace();
         $this->current()->addSubsegment(
             (new SqlSegment())
-                ->setName($connection->getName() . ' at ' . $this->getCallerClass($backtrace))
+                ->setName($connection->getName())
                 ->setDatabaseType($connection->getDriverName())
                 ->setQuery($sql)
                 ->addMetadata('backtrace', $backtrace)
+                ->addAnnotation('controller', $this->getCallerClass($backtrace))
                 ->begin()
                 ->end($time / 1000)
         );

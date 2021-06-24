@@ -8,7 +8,7 @@ trait Backtracer
 {
     public function getBacktrace(): array
     {
-        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT, 50);
+        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT, 30);
         $sources = [];
         foreach ($stack as $index => $trace) {
             $trace = $this->parseTrace($index, $trace);
@@ -17,7 +17,7 @@ trait Backtracer
             }
         }
 
-        return array_slice(array_filter($sources), 0, 10);
+        return array_slice(array_filter($sources), 0, 5);
     }
 
     public function getCallerClass(array $backtrace): string
@@ -29,7 +29,7 @@ trait Backtracer
 
     protected function parseTrace($index, array $trace)
     {
-        if (isset($trace['class']) && ! $this->isExcludedClass($trace['class'])) {
+        if (isset($trace['class']) && !$this->isExcludedClass($trace['class'])) {
             return $trace['class'] . ':' . ($trace['line'] ?? '?');
         }
 
