@@ -20,19 +20,21 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         versions:
-          - "7.2-5.5-3"
-          # - "7.2-5.8-3"
-          # - "7.2-6-4"
-          # - "7.2-7-5"
-          # - "7.2-8-6"
-          # - "7.4-6-4"
-          # - "7.4-7-5"
-          # - "7.4-8-6"
-          # - "8-6-4"
-          # - "8-7-5"
-          # - "8-8-6"
+          - "7.2-5.5"
+          - "7.2-5.6"
+          # - "7.2-5.8"
+          # - "7.2-6"
+          # - "7.2-7"
+          # - "7.2-8"
+          # - "7.4-6"
+          # - "7.4-7"
+          # - "7.4-8"
+          # - "8.0-6"
+          # - "8.0-7"
+          # - "8.0-8"
 
     steps:
       - uses: actions/checkout@v2
@@ -44,9 +46,22 @@ jobs:
           result-encoding: string
           script: |
             const composer = require('./composer.json');
-            const [php, laravel, testbench] = '${{ matrix.versions }}'.split('-');
+            const [php, laravel] = '${{ matrix.versions }}'.split('-');
             composer.require['laravel/framework'] = '^'.concat(laravel);
-            composer['require-dev']['orchestra/testbench'] = '^'.concat(testbench);
+            if (laravel.startsWith('5')) {
+              const laravelMinor = laravel.split('.')[1] || '5';
+              composer['require-dev']['orchestra/testbench'] = '~3.'+laravelMinor;
+              composer['require-dev']['phpunit/phpunit'] = laravelMinor === '5' ? '^6' : '^7.5';
+            } else if (laravel.startsWith('6')) {
+              composer['require-dev']['orchestra/testbench'] = '~4';
+              composer['require-dev']['phpunit/phpunit'] = '~8';
+            } else if (laravel.startsWith('7')) {
+              composer['require-dev']['orchestra/testbench'] = '~5';
+              composer['require-dev']['phpunit/phpunit'] = '~9';
+            } else if (laravel.startsWith('8')) {
+              composer['require-dev']['orchestra/testbench'] = '~6';
+              composer['require-dev']['phpunit/phpunit'] = '~9';
+            }
 
             return JSON.stringify(composer);
 
