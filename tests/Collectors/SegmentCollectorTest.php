@@ -12,7 +12,7 @@ class SegmentCollectorTest extends TestCase
 {
     public function test_disable_trace_if_filtered()
     {
-        $request = $this->createStub(Request::class);
+        $request = $this->createMock(Request::class);
         $request->expects($this->any())->method('ip')->willReturn('some-ip');
         $request->expects($this->any())->method('url')->willReturn('some-url');
         $request->expects($this->any())->method('method')->willReturn('GET');
@@ -26,7 +26,7 @@ class SegmentCollectorTest extends TestCase
 
     public function test_should_enable_trace()
     {
-        $request = $this->createStub(Request::class);
+        $request = $this->createMock(Request::class);
         $request->expects($this->any())->method('ip')->willReturn('some-ip');
         $request->expects($this->any())->method('url')->willReturn('some-url');
         $request->expects($this->any())->method('method')->willReturn('GET');
