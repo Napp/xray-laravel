@@ -1,6 +1,12 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   php-cs-fixer:
@@ -15,13 +21,52 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [7.2, 7.4, 8.0]
+        versions:
+          - "7.2-5.5-3"
+          # - "7.2-5.8-3"
+          # - "7.2-6-4"
+          # - "7.2-7-5"
+          # - "7.2-8-6"
+          # - "7.4-6-4"
+          # - "7.4-7-5"
+          # - "7.4-8-6"
+          # - "8-6-4"
+          # - "8-7-5"
+          # - "8-8-6"
 
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up composer.json
+        id: composer
+        uses: actions/github-script@v4
+        with:
+          result-encoding: string
+          script: |
+            const composer = require('./composer.json');
+            const [php, laravel, testbench] = '${{ matrix.versions }}'.split('-');
+            composer.require['laravel/framework'] = '^'.concat(laravel);
+            composer['require-dev']['orchestra/testbench'] = '^'.concat(testbench);
+
+            return JSON.stringify(composer);
+
+      - name: Set up PHP version
+        id: php
+        uses: actions/github-script@v4
+        with:
+          result-encoding: string
+          script: |
+            const [php] = '${{ matrix.versions }}'.split('-');
+            return php;
+
+      - name: Rewrite composer.json
+        run: |
+          rm composer.json
+          echo '${{ steps.composer.outputs.result }}' > composer.json
+          cat composer.json
+
       - uses: php-actions/composer@v6
         with:
-          php_version: ${{ matrix.php }}
+          php_version: ${{ steps.php.outputs.result }}
 
       - uses: php-actions/phpunit@v3
