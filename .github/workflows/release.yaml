@@ -8,55 +8,29 @@ on:
       - "*"
 
 jobs:
-  generate-changelog:
-    name: Generate changelog
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest published release tag
-        id: get_latest_release
-        uses: pozetroninc/github-action-get-latest-release@v0.5.0
-        with:
-          repository: ${{ github.repository }}
-          excludes: prerelease, draft
-      - name: Generate changelog since last published release
-        uses: charmixer/auto-changelog-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          future_release: ${{ github.ref }}
-          since_tag: ${{ steps.get_latest_release.outputs.release }}
-      - name: Upload changelog
-        uses: actions/upload-artifact@v2
-        with:
-          name: changelog
-          path: CHANGELOG.md
-
-  draft-release:
-    name: Draft Github release
-    needs: generate-changelog
-    runs-on: ubuntu-20.04
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-      - name: Extract tag name
-        id: tag
-        uses: actions/github-script@v4
-        with:
-          result-encoding: string
-          script: |
-            return context.payload.ref.replace(/\/refs\/tags\//, '');
-
-      - name: Download changelog
-        uses: actions/download-artifact@v2
-        with:
-          name: changelog
-      - name: Draft release with changelog
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: actions/create-release@v1
         with:
-          tag_name: ${{ steps.tag.outputs.result }}
-          release_name: POS System ${{ steps.tag.outputs.result }}
-          body_path: CHANGELOG.md
-          draft: true
-          prerelease: false
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: ${{steps.github_release.outputs.changelog}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          delete-branch: true
+          title: Updating CHNAGELOG.md
+          body: ${{steps.github_release.outputs.changelog}}
+          labels: doc,changelog
