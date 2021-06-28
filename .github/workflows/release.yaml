@@ -26,11 +26,3 @@ jobs:
           body: ${{steps.github_release.outputs.changelog}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create PR
-        uses: peter-evans/create-pull-request@v3
-        with:
-          delete-branch: true
-          title: Updating CHNAGELOG.md
-          body: ${{steps.github_release.outputs.changelog}}
-          labels: doc,changelog
