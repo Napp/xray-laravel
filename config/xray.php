@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 return [
+    'name' => env('AWS_XRAY_SERVICE_NAME'),
+
+    'route_filters' => explode(',', env('AWS_XRAY_ROUTE_FILTERS', '')),
+
     'enabled' => env('AWS_XRAY_ENABLED', true),
 
     /*

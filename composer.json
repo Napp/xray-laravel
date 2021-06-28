@@ -16,6 +16,7 @@
         "aws/aws-sdk-php": "^3.133"
     },
     "require-dev": {
+        "orchestra/testbench": "^6",
         "phpunit/phpunit": "^9"
     },
     "autoload": {

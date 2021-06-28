@@ -8,13 +8,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: docker://oskarstark/php-cs-fixer-ga
+      - uses: actions/checkout@v2
+      - uses: docker://oskarstark/php-cs-fixer-ga
 
   build-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [7.2, 7.4, 8.0]
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: php-actions/composer@v5
-    - uses: php-actions/phpunit@v2
+      - uses: actions/checkout@v2
+
+      - uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php }}
+
+      - uses: php-actions/phpunit@v3

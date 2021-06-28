@@ -17,10 +17,9 @@ class RouteCollector extends EventsCollector
 
         // Time between route resolution and request handled
         $this->app['events']->listen(RouteMatched::class, function ($event) {
-            $this->addSegment('request handled', null, ['controller' => $this->getController()]);
-            $this->getSegment('route matching')
-                ->addAnnotation('route', $event->route->getActionName() ?? 'unknown')
-                ->end();
+            $this->addSegment('request handled')
+                ->addAnnotation('controller', $this->getController());
+            $this->getSegment('route matching')->end();
         });
 
         $this->app['events']->listen(RequestHandled::class, function () {
@@ -32,13 +31,13 @@ class RouteCollector extends EventsCollector
         });
     }
 
-    protected function getController(): ?string
+    protected function getController(): string
     {
         /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
 
         $route = $router->current();
-        $controller = $route ? $route->getActionName() : null;
+        $controller = $route ? $route->getActionName() : 'unknown route';
 
         if ($controller instanceof \Closure) {
             return 'anonymous function';
@@ -52,8 +51,8 @@ class RouteCollector extends EventsCollector
             } else {
                 $controller = $controller[0] . '::' . $controller[1];
             }
-        } elseif (! is_string($controller)) {
-            return null;
+        } elseif (!is_string($controller)) {
+            return 'unknown route';
         }
 
         return $controller;

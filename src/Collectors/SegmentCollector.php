@@ -32,6 +32,11 @@ class SegmentCollector
         return (bool) config('xray.enabled');
     }
 
+    public function getRouteFilters(): array
+    {
+        return (array) config('xray.route_filters');
+    }
+
     public function getSampleRate(): int
     {
         return (int) config('xray.sample_rate');
@@ -46,12 +51,16 @@ class SegmentCollector
         $this->segments = [];
         $tracer = $this->tracer()
             ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
-            ->setName(config('app.name'))
+            ->setName(config('xray.name') ?? config('app.name'))
             ->setClientIpAddress($request->ip())
             ->setUrl($request->url())
             ->setMethod($request->method());
 
         $tracer->begin($this->getSampleRate());
+
+        if (in_array($request->path(), $this->getRouteFilters(), true)) {
+            $tracer->setSampled(false);
+        }
     }
 
     public function initCliTracer(string $name): void
@@ -62,7 +71,7 @@ class SegmentCollector
 
         $this->segments = [];
         $tracer = $this->tracer()
-            ->setName(config('app.name') . ' CLI')
+            ->setName((config('xray.name') ?? config('app.name')) . ' CLI')
             ->setUrl($name);
 
         $tracer->begin($this->getSampleRate());
