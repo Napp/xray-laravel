@@ -5,8 +5,6 @@ on:
     branches:
       - master
   pull_request:
-    branches:
-      - master
 
 jobs:
   php-cs-fixer:
@@ -23,11 +21,11 @@ jobs:
       fail-fast: false
       matrix:
         versions:
-          # - "7.2-5.6"
-          # - "7.2-5.8"
+          - "7.2-5.6"
+          - "7.2-5.8"
           - "7.2-6"
-          # - "7.3-5.6"
-          # - "7.3-5.8"
+          - "7.3-5.6"
+          - "7.3-5.8"
           - "7.3-6"
           - "7.3-7"
           - "7.4-6"
@@ -40,7 +38,31 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up composer.json
+      - name: Set up PHPUnit version
+        id: phpunit
+        uses: actions/github-script@v4
+        with:
+          result-encoding: string
+          script: |
+            const [php, laravel] = '${{ matrix.versions }}'.split('-');
+            return laravel.startsWith("5")
+              ? laravel.split(".")[1] === "5"
+                ? "6.0"
+                : "7"
+              : laravel.startsWith("6")
+                ? "8"
+                : "9";
+
+      - name: Set up PHP version
+        id: php
+        uses: actions/github-script@v4
+        with:
+          result-encoding: string
+          script: |
+            const [php] = '${{ matrix.versions }}'.split('-');
+            return php;
+
+      - name: Update composer.json
         id: composer
         uses: actions/github-script@v4
         with:
@@ -51,32 +73,16 @@ jobs:
 
             composer.require['php'] = '~'.concat(php);
             composer.require['laravel/framework'] = '~'.concat(laravel);
+            composer['require-dev']['phpunit/phpunit'] = '~${{ steps.phpunit.outputs.result }}';
 
             if (laravel.startsWith('5')) {
-              const laravelMinor = laravel.split('.')[1] || '5';
-              composer['require-dev']['orchestra/testbench'] = '~3.'+laravelMinor;
-              composer['require-dev']['phpunit/phpunit'] = laravelMinor === '5' ? '~6.0' : '^7.5';
-            } else if (laravel.startsWith('6')) {
-              composer['require-dev']['orchestra/testbench'] = '~4';
-              composer['require-dev']['phpunit/phpunit'] = '~8';
-            } else if (laravel.startsWith('7')) {
-              composer['require-dev']['orchestra/testbench'] = '~5';
-              composer['require-dev']['phpunit/phpunit'] = '~9';
-            } else if (laravel.startsWith('8')) {
-              composer['require-dev']['orchestra/testbench'] = '~6';
-              composer['require-dev']['phpunit/phpunit'] = '~9';
+              composer['require-dev']['orchestra/testbench'] = '~3.'+laravel.split('.')[1] || '5';
+            } else {
+              const version = parseInt(laravel.split('.')[0], 10);
+              composer['require-dev']['orchestra/testbench'] = '~'.concat(version-2);
             }
 
             return JSON.stringify(composer);
-
-      - name: Set up PHP version
-        id: php
-        uses: actions/github-script@v4
-        with:
-          result-encoding: string
-          script: |
-            const [php] = '${{ matrix.versions }}'.split('-');
-            return php;
 
       - name: Rewrite composer.json
         run: |
@@ -89,3 +95,6 @@ jobs:
           php_version: ${{ steps.php.outputs.result }}
 
       - uses: php-actions/phpunit@v3
+        with:
+          version: ${{ steps.phpunit.outputs.result }}
+          php_version: ${{ steps.php.outputs.result }}
