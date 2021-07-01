@@ -54,6 +54,7 @@ class SegmentCollector
             ->setName(config('xray.name') ?? config('app.name'))
             ->setClientIpAddress($request->ip())
             ->setUrl($request->url())
+            ->setUserAgent(substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 300))
             ->setMethod($request->method());
 
         $tracer->begin($this->getSampleRate());
