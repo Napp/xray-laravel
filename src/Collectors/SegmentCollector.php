@@ -6,6 +6,7 @@ namespace Napp\Xray\Collectors;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Napp\Xray\Segments\HttpSegment;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\Segment;
@@ -102,6 +103,34 @@ class SegmentCollector
         return $segment;
     }
 
+    /**
+     * Add HTTP segment
+     *
+     * $config default values:
+     * [
+     *   "method": "GET",
+     *   "contentLength": null,
+     * ]
+     *
+     * @param string $name
+     * @param string $url
+     * @param string|null $method = "GET"
+     * @return Segment
+     */
+    public function addHttpSegment(string $name, string $url, ?string $method = 'GET'): Segment
+    {
+        $segment = (new HttpSegment())->setName($name);
+
+        $segment->setMethod($method);
+        $segment->setUrl($url);
+
+        $this->current()->addSubsegment($segment);
+        $segment->begin();
+        $this->segments[$name] = $segment;
+
+        return $segment;
+    }
+
     public function getSegment(string $name): ?Segment
     {
         if ($this->hasAddedSegment($name)) {
@@ -114,6 +143,25 @@ class SegmentCollector
     public function endSegment(string $name): void
     {
         if ($this->hasAddedSegment($name)) {
+            $this->segments[$name]->end();
+
+            unset($this->segments[$name]);
+        }
+    }
+
+    /**
+     * End HTTP segment by segment name
+     *
+     * @param string $name
+     * @param integer|null $responseCode = 200
+     * @return void
+     */
+    public function endHttpSegment(string $name, ?int $responseCode = 200): void
+    {
+        if ($this->hasAddedSegment($name)) {
+            if ($this->segments[$name] instanceof HttpSegment) {
+                $this->segments[$name]->setResponseCode($responseCode);
+            }
             $this->segments[$name]->end();
 
             unset($this->segments[$name]);

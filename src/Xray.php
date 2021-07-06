@@ -44,6 +44,11 @@ class Xray
         return $this->collector->addCustomSegment($segment, $name);
     }
 
+    public function addHttpSegment(string $name, string $url, ?string $method = 'GET'): Segment
+    {
+        return $this->collector->addHttpSegment($name, $url, $method);
+    }
+
     public function getSegment(string $name): ?Segment
     {
         return $this->collector->getSegment($name);
@@ -52,6 +57,11 @@ class Xray
     public function endSegment(string $name): void
     {
         $this->collector->endSegment($name);
+    }
+
+    public function endHttpSegment(string $name, ?int $responseCode = 200): void
+    {
+        $this->collector->endHttpSegment($name, $responseCode);
     }
 
     public function hasAddedSegment(string $name): bool

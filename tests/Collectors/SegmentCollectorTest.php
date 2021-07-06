@@ -6,6 +6,7 @@ namespace Napp\Xray\Tests;
 
 use Illuminate\Http\Request;
 use Napp\Xray\Collectors\SegmentCollector;
+use Napp\Xray\Segments\HttpSegment;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -31,6 +32,23 @@ class SegmentCollectorTest extends TestCase
         $segment->initHttpTracer($request);
 
         $this->assertTrue($segment->tracer()->isSampled());
+    }
+
+    public function test_should_add_http_segment()
+    {
+        $collector = new SegmentCollector();
+        $collector->addHttpSegment('example', 'http://example.com', 'POST');
+
+        $data = $collector->getSegment('example')->jsonSerialize();
+        $this->assertEquals('POST', $data['http']['request']['method']);
+        $this->assertEquals('http://example.com', $data['http']['request']['url']);
+
+        $collector->endHttpSegment('example', 400);
+
+        $this->assertNull($collector->getSegment('example'));
+
+        $data = $collector->current()->jsonSerialize()['subsegments'][0]->jsonSerialize();
+        $this->assertEquals(400, $data['http']['response']['status']);
     }
 
     protected function createRequest(): MockObject
