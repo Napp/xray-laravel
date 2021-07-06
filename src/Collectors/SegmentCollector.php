@@ -106,26 +106,29 @@ class SegmentCollector
     /**
      * Add HTTP segment
      *
+     * If name is not set, it will use url
+     *
      * $config default values:
      * [
      *   "method": "GET",
-     *   "contentLength": null,
+     *   "name": null,
      * ]
      *
      * @param string $name
-     * @param string $url
-     * @param string|null $method = "GET"
+     * @param array|null $config
      * @return Segment
      */
-    public function addHttpSegment(string $name, string $url, ?string $method = 'GET'): Segment
+    public function addHttpSegment(string $url, ?array $config = []): Segment
     {
-        $segment = (new HttpSegment())->setName($name);
+        $name = $config['name'] ?? $url;
+        $method = $config['method'] ?? 'GET';
 
-        $segment->setMethod($method);
-        $segment->setUrl($url);
+        $segment = (new HttpSegment())->setName($name)
+            ->setMethod($method)
+            ->setUrl($url)
+            ->begin();
 
         $this->current()->addSubsegment($segment);
-        $segment->begin();
         $this->segments[$name] = $segment;
 
         return $segment;

@@ -37,7 +37,7 @@ class SegmentCollectorTest extends TestCase
     public function test_should_add_http_segment()
     {
         $collector = new SegmentCollector();
-        $collector->addHttpSegment('example', 'http://example.com', 'POST');
+        $collector->addHttpSegment('http://example.com', ['method' => 'POST', 'name' => 'example']);
 
         $data = $collector->getSegment('example')->jsonSerialize();
         $this->assertEquals('POST', $data['http']['request']['method']);

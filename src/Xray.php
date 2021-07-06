@@ -44,7 +44,7 @@ class Xray
         return $this->collector->addCustomSegment($segment, $name);
     }
 
-    public function addHttpSegment(string $name, string $url, ?string $method = 'GET'): Segment
+    public function addHttpSegment(string $url, ?array $config = []): Segment
     {
         return $this->collector->addHttpSegment($name, $url, $method);
     }
