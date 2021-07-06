@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Napp\Xray\Segments;
 
-use Pkerrigan\Xray\HttpSegment as XrayHttpSegment;
+use Pkerrigan\Xray\HttpSegment as BaseSegment;
 
-class HttpSegment extends XrayHttpSegment
+class HttpSegment extends BaseSegment
 {
 }

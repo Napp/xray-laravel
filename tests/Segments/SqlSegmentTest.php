@@ -42,8 +42,8 @@ class SqlSegmentTest extends TestCase
 
         $serialized = $segment->jsonSerialize();
 
-        $this->assertEquals(1584448767.5, $serialized['start_time']);
-        $this->assertEquals(1584448768.5, $serialized['end_time']);
+        $this->assertEquals(1584448766.5, $serialized['start_time']);
+        $this->assertEquals(1584448767.5, $serialized['end_time']);
     }
 
     public function test_setting_end_time()
@@ -61,6 +61,7 @@ class SqlSegmentTest extends TestCase
 
         $serialized = $segment->jsonSerialize();
 
-        $this->assertEquals(1584448767.6, $serialized['end_time']);
+        $this->assertEquals(1584448767.4, $serialized['start_time']);
+        $this->assertEquals(1584448767.5, $serialized['end_time']);
     }
 }
