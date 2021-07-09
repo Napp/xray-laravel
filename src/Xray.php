@@ -44,9 +44,24 @@ class Xray
         return $this->collector->addCustomSegment($segment, $name);
     }
 
+    /**
+     * Add HTTP segment
+     *
+     * If name is not set, it will use url
+     *
+     * $config default values:
+     * [
+     *   "method": "GET",
+     *   "name": null,
+     * ]
+     *
+     * @param string $name
+     * @param array|null $config
+     * @return Segment
+     */
     public function addHttpSegment(string $url, ?array $config = []): Segment
     {
-        return $this->collector->addHttpSegment($name, $url, $method);
+        return $this->collector->addHttpSegment($url, $config);
     }
 
     public function getSegment(string $name): ?Segment
@@ -59,6 +74,13 @@ class Xray
         $this->collector->endSegment($name);
     }
 
+    /**
+     * End HTTP segment by segment name
+     *
+     * @param string $name
+     * @param integer|null $responseCode = 200
+     * @return void
+     */
     public function endHttpSegment(string $name, ?int $responseCode = 200): void
     {
         $this->collector->endHttpSegment($name, $responseCode);

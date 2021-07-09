@@ -103,21 +103,6 @@ class SegmentCollector
         return $segment;
     }
 
-    /**
-     * Add HTTP segment
-     *
-     * If name is not set, it will use url
-     *
-     * $config default values:
-     * [
-     *   "method": "GET",
-     *   "name": null,
-     * ]
-     *
-     * @param string $name
-     * @param array|null $config
-     * @return Segment
-     */
     public function addHttpSegment(string $url, ?array $config = []): Segment
     {
         $name = $config['name'] ?? $url;
@@ -152,13 +137,6 @@ class SegmentCollector
         }
     }
 
-    /**
-     * End HTTP segment by segment name
-     *
-     * @param string $name
-     * @param integer|null $responseCode = 200
-     * @return void
-     */
     public function endHttpSegment(string $name, ?int $responseCode = 200): void
     {
         if ($this->hasAddedSegment($name)) {
