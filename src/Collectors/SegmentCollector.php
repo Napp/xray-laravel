@@ -6,9 +6,9 @@ namespace Napp\Xray\Collectors;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Napp\Xray\Segments\HttpSegment;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
+use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
 
 class SegmentCollector
