@@ -16,7 +16,7 @@ class SegmentCollector
     use Backtracer;
 
     /** @var array */
-    protected $segments;
+    protected $segments = [];
 
     public function tracer(): Trace
     {
@@ -103,7 +103,7 @@ class SegmentCollector
         return $segment;
     }
 
-    public function addHttpSegment(string $url, ?array $config = []): Segment
+    public function addHttpSegment(string $url, ?array $config = []): HttpSegment
     {
         $name = $config['name'] ?? $url;
         $method = $config['method'] ?? 'GET';
@@ -131,18 +131,6 @@ class SegmentCollector
     public function endSegment(string $name): void
     {
         if ($this->hasAddedSegment($name)) {
-            $this->segments[$name]->end();
-
-            unset($this->segments[$name]);
-        }
-    }
-
-    public function endHttpSegment(string $name, ?int $responseCode = 200): void
-    {
-        if ($this->hasAddedSegment($name)) {
-            if ($this->segments[$name] instanceof HttpSegment) {
-                $this->segments[$name]->setResponseCode($responseCode);
-            }
             $this->segments[$name]->end();
 
             unset($this->segments[$name]);
