@@ -36,7 +36,7 @@ class DatabaseQueryCollector extends EventsCollector
                 ->setDatabaseType($connection->getDriverName())
                 ->setQuery($sql)
                 ->addMetadata('backtrace', $backtrace)
-                ->addAnnotation($connection->getName() . '_controller', $this->getCallerClass($backtrace))
+                ->addAnnotation('controller', $this->getCallerClass($backtrace))
                 ->begin()
                 ->end($time / 1000)
         );
