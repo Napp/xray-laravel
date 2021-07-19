@@ -23,7 +23,7 @@ class DatabaseQueryCollector extends EventsCollector
         $this->bindingsEnabled = config('xray.db_bindings');
     }
 
-    protected function handleQueryReport(string $sql, array $bindings, float $time, Connection $connection): void
+    public function handleQueryReport(string $sql, array $bindings, float $time, Connection $connection): void
     {
         if ($this->bindingsEnabled) {
             $sql = $this->parseBindings($sql, $bindings, $connection);
@@ -44,6 +44,10 @@ class DatabaseQueryCollector extends EventsCollector
 
     private function parseBindings(string $sql, array $bindings, Connection $connection): string
     {
+        if (substr_count($sql, '?') != count($bindings)) {
+            return $sql;
+        }
+
         $sql = str_replace(['%', '?'], ['%%', '%s'], $sql);
 
         $handledBindings = array_map(function ($binding) {
