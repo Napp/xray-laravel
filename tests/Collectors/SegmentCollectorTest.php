@@ -64,6 +64,26 @@ class SegmentCollectorTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function test_handle_exception()
+    {
+        // should not rethrow exception
+        $this->app['config']->set('xray.ignore_error', true);
+        $exception =  new \Exception('message', 0);
+        $collector = new SegmentCollector();
+
+        $collector->handleException($exception);
+
+        $serialized = $collector->current()->jsonSerialize();
+        $this->assertEquals('message', $serialized['annotations']['xrayError']);
+        $this->assertNotEmpty(($serialized['metadata']['xrayDatabaseQueryTrace']));
+
+        // should rethrow exception
+        $this->app['config']->set('xray.ignore_error', false);
+        $this->expectException(\Exception::class);
+
+        $collector->handleException($exception);
+    }
+
     protected function createRequest()
     {
         $request = $this->createMock(Request::class);

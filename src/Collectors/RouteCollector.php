@@ -17,17 +17,21 @@ class RouteCollector extends EventsCollector
 
         // Time between route resolution and request handled
         $this->app['events']->listen(RouteMatched::class, function ($event) {
-            $this->addSegment('request handled')
-                ->addAnnotation('controller', $this->getController());
-            $this->getSegment('route matching')->end();
+            $this->endSegment('route matching');
+            // Some middlewares might return a response
+            // before the RouteMatched has been dispatched
+            // end the segment first avoid missing end time
+            try {
+                $this->addSegment('request handled')
+                    ->addAnnotation('controller', $this->getController())
+                    ->end();
+            } catch (\Exception $e) {
+                $this->handleException($e);
+            }
         });
 
         $this->app['events']->listen(RequestHandled::class, function () {
-            // Some middlewares might return a response
-            // before the RouteMatched has been dispatched
-            if ($this->hasAddedSegment('request handled')) {
-                $this->endSegment('request handled');
-            }
+            $this->endSegment('request handled');
         });
     }
 

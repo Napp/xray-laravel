@@ -6,6 +6,7 @@ namespace Napp\Xray\Collectors;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
@@ -171,5 +172,26 @@ class SegmentCollector
         $tracer->end()->submit(new $submitterClass());
 
         $tracer::flush();
+    }
+
+    /**
+     * Record and log the exception
+     *
+     * If [ignore_error] is set to false, it will rethrow the exception
+     *
+     * @throws \Exception iif set [ignore_error] to false
+     *
+     * @param \Exception $e
+     * @return void
+     */
+    public function handleException(\Exception $e)
+    {
+        Log::warning($e->getMessage(), ['exception' => $e]);
+        $this->current()
+            ->addAnnotation('xrayError', $e->getMessage())
+            ->addMetadata('xrayDatabaseQueryTrace', $e->getTraceAsString());
+        if (!config('xray.ignore_error')) {
+            throw $e;
+        }
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Napp\Xray\Collectors;
 
+use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Query\Expression;
@@ -16,8 +17,12 @@ class DatabaseQueryCollector extends EventsCollector
     public function registerEventListeners(): void
     {
         $this->app->events->listen(QueryExecuted::class, function (QueryExecuted $query) {
-            $sql = $query->sql instanceof Expression ? $query->sql->getValue() : $query->sql;
-            $this->handleQueryReport($sql, $query->bindings, $query->time, $query->connection);
+            try {
+                $sql = $query->sql instanceof Expression ? $query->sql->getValue() : $query->sql;
+                $this->handleQueryReport($sql, $query->bindings, $query->time, $query->connection);
+            } catch (Exception $e) {
+                $this->handleException($e);
+            }
         });
 
         $this->bindingsEnabled = config('xray.db_bindings');

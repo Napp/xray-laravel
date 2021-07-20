@@ -5,9 +5,28 @@ declare(strict_types=1);
 return [
     'name' => env('AWS_XRAY_SERVICE_NAME'),
 
-    'route_filters' => explode(',', env('AWS_XRAY_ROUTE_FILTERS', '')),
-
     'enabled' => env('AWS_XRAY_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ignoring any possible error
+    |--------------------------------------------------------------------------
+    |
+    | In production, it will possibly need to ignore error from Xray.
+    |
+    */
+    'ignore_error' => env('AWS_XRAY_IGNORE_ERROR', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ignored routes
+    |--------------------------------------------------------------------------
+    |
+    | Comma separated value to ignore record Xray.
+    | Default will allow all routes to trace.
+    |
+    */
+    'route_filters' => explode(',', env('AWS_XRAY_ROUTE_FILTERS', '')),
 
     /*
     |--------------------------------------------------------------------------
@@ -15,6 +34,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This is where you can set the data submission method.
+    | If [AWS_XRAY_DAEMON_HOST] is set, it will automatically using [DaemonSegmentSubmitter]
     | Supported classes: "APISegmentSubmitter", "DaemonSegmentSubmitter"
     |
     */
