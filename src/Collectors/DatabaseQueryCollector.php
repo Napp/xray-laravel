@@ -13,6 +13,7 @@ use Napp\Xray\Segments\SqlSegment;
 class DatabaseQueryCollector extends EventsCollector
 {
     protected $bindingsEnabled = false;
+    protected $eraseQuery = false;
 
     public function registerEventListeners(): void
     {
@@ -26,11 +27,14 @@ class DatabaseQueryCollector extends EventsCollector
         });
 
         $this->bindingsEnabled = config('xray.db_bindings');
+        $this->eraseQuery = config('xray.db_erase_query');
     }
 
     public function handleQueryReport(string $sql, array $bindings, float $time, Connection $connection): void
     {
-        if ($this->bindingsEnabled) {
+        if ($this->eraseQuery) {
+            $sql = '';
+        } else if ($this->bindingsEnabled) {
             $sql = $this->parseBindings($sql, $bindings, $connection);
         }
 
