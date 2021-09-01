@@ -93,6 +93,7 @@ class DaemonSegmentSubmitterWithLog
 
     public function __destruct()
     {
+        Log::channel('trace-log')->debug('xray destruct');
         socket_close($this->socket);
     }
 
@@ -129,7 +130,7 @@ class DaemonSegmentSubmitterWithLog
      */
     private function sendPacket(string $packet)
     {
-        socket_sendto($this->socket, $packet, strlen($packet), 0, $this->host, $this->port);
+        return socket_sendto($this->socket, $packet, strlen($packet), 0, $this->host, $this->port);
     }
 
     /**
