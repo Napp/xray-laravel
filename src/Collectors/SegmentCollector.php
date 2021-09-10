@@ -156,8 +156,12 @@ class SegmentCollector
         if (app()->bound(Auth::class) && Auth::check()) {
             $tracer->setUser((string) Auth::user()->getAuthIdentifier());
         }
+
+        $statusCode = $response->getStatusCode();
         $tracer->end()
-            ->setResponseCode($response->getStatusCode())
+            ->setResponseCode($statusCode)
+            ->setError($statusCode >= 400 && $statusCode < 500)
+            ->setFault($statusCode >= 500 && $statusCode < 600)
             ->submit(new $submitterClass());
     }
 
