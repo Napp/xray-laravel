@@ -13,12 +13,7 @@ class FrameworkCollector extends EventsCollector
         }
         // Application and Laravel startup times
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : microtime(true);
-        $this->addSegment('composer autoload', $startTime);
-
-        $this->app->booting(function () {
-            $this->addSegment('laravel boot');
-            $this->endSegment('composer autoload');
-        });
+        $this->addSegment('laravel boot', $startTime);
 
         $this->app->booted(function () {
             $this->endSegment('laravel boot');
