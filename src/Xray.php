@@ -6,9 +6,9 @@ namespace Napp\Xray;
 
 use Illuminate\Http\Request;
 use Napp\Xray\Collectors\SegmentCollector;
+use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
-use Pkerrigan\Xray\Trace;
 
 class Xray
 {

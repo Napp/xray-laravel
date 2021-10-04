@@ -7,6 +7,7 @@ namespace Napp\Xray\Collectors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Napp\Xray\Segments\SegmentWithPublicName;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
@@ -16,7 +17,7 @@ class SegmentCollector
 {
     use Backtracer;
 
-    /** @var array */
+    /** @var SegmentWithPublicName[] */
     protected $segments = [];
 
     public function tracer(): Trace
@@ -90,7 +91,7 @@ class SegmentCollector
 
         $this->current()->addSubsegment($segment);
         $segment->begin($startTime);
-        $this->segments[$name] = $segment;
+        $this->segments[$segment->getId()] = new SegmentWithPublicName($segment, $name);
 
         return $segment;
     }
@@ -99,7 +100,7 @@ class SegmentCollector
     {
         $this->current()->addSubsegment($segment);
         $segment->begin();
-        $this->segments[$name] = $segment;
+        $this->segments[$segment->getId()] = new SegmentWithPublicName($segment, $name);
 
         return $segment;
     }
@@ -115,32 +116,48 @@ class SegmentCollector
             ->begin();
 
         $this->current()->addSubsegment($segment);
-        $this->segments[$name] = $segment;
+        $this->segments[$segment->getId()] = new SegmentWithPublicName($segment, $name);
 
         return $segment;
     }
 
     public function getSegment(string $name): ?Segment
     {
-        if ($this->hasAddedSegment($name)) {
-            return $this->segments[$name];
+        foreach ($this->segments as $key => $segment) {
+            if ($name == $segment->name) {
+                return $segment->segment;
+            }
         }
 
         return null;
     }
 
+    public function getSegmentById(string $id): ?Segment
+    {
+        return \array_key_exists($id, $this->segments)
+            ? $this->segments[$id]->segment
+            : null;
+    }
+
     public function endSegment(string $name): void
     {
-        if ($this->hasAddedSegment($name)) {
-            $this->segments[$name]->end();
+        $segment = $this->getSegment($name);
+        if (!is_null($segment)) {
+            $this->dropSegment($segment);
+        }
+    }
 
-            unset($this->segments[$name]);
+    public function endSegmentById(string $id): void
+    {
+        $segment = $this->getSegmentById($id);
+        if (!is_null($segment)) {
+            $this->dropSegment($segment);
         }
     }
 
     public function hasAddedSegment(string $name): bool
     {
-        return \array_key_exists($name, $this->segments);
+        return !is_null($this->getSegment($name));
     }
 
     public function endCurrentSegment(): void
@@ -197,5 +214,12 @@ class SegmentCollector
         if (!config('xray.ignore_error')) {
             throw $e;
         }
+    }
+
+    protected function dropSegment(Segment $segment)
+    {
+        $segment->end();
+
+        unset($this->segments[$segment->getId()]);
     }
 }

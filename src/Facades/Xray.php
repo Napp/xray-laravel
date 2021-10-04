@@ -6,8 +6,8 @@ namespace Napp\Xray\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use Napp\Xray\Segments\Trace;
-use Pkerrigan\Xray\Segment;
 use Pkerrigan\Xray\HttpSegment;
+use Pkerrigan\Xray\Segment;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
