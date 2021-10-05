@@ -6,6 +6,8 @@ namespace Napp\Xray;
 
 use Illuminate\Http\Request;
 use Napp\Xray\Collectors\SegmentCollector;
+use Napp\Xray\Config\HttpSegmentConfig;
+use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
@@ -35,49 +37,48 @@ class Xray
         return $this->collector->isTracerEnabled();
     }
 
-    public function addSegment(string $name, ?float $startTime = null, ?array $metadata = null): Segment
+    public function addSegment(?SegmentConfig $config): Segment
     {
-        return $this->collector->addSegment($name, $startTime, $metadata);
+        return $this->collector->addSegment($config);
     }
 
-    public function addCustomSegment(Segment $segment, string $name): Segment
+    public function addHttpSegment(?HttpSegmentConfig $config): HttpSegment
     {
-        return $this->collector->addCustomSegment($segment, $name);
+        return $this->collector->addHttpSegment($config);
+    }
+
+    public function addCustomSegment(Segment $segment, ?SegmentConfig $config): Segment
+    {
+        return $this->collector->addCustomSegment($segment, $config);
     }
 
     /**
-     * Add HTTP segment
-     *
-     * If name is not set, it will use url
-     *
-     * $config default values:
-     * [
-     *   "method": "GET",
-     *   "name": null,
-     * ]
-     *
      * @param string $name
-     * @param array|null $config
-     * @return Segment
+     * @return Segment[]
      */
-    public function addHttpSegment(string $url, ?array $config = []): HttpSegment
+    public function getSegmentByName(string $name): array
     {
-        return $this->collector->addHttpSegment($url, $config);
+        return $this->collector->getSegmentByName($name);
     }
 
-    public function getSegment(string $name): ?Segment
+    public function getSegmentById(string $id): ?Segment
     {
-        return $this->collector->getSegment($name);
+        return $this->collector->getSegmentById($id);
     }
 
-    public function endSegment(string $name): void
+    public function endSegmentByName(string $name): void
     {
-        $this->collector->endSegment($name);
+        $this->collector->endSegmentByName($name);
     }
 
-    public function hasAddedSegment(string $name): bool
+    public function endSegmentById(string $id): void
     {
-        return $this->collector->hasAddedSegment($name);
+        $this->collector->endSegmentById($id);
+    }
+
+    public function nameExist(string $name): bool
+    {
+        return $this->collector->nameExist($name);
     }
 
     public function endCurrentSegment(): void

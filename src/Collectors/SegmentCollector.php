@@ -7,7 +7,9 @@ namespace Napp\Xray\Collectors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Napp\Xray\Segments\SegmentWithPublicName;
+use Napp\Xray\Config\HttpSegmentConfig;
+use Napp\Xray\Config\SegmentConfig;
+use Napp\Xray\Segments\NamedSegment;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
@@ -17,7 +19,7 @@ class SegmentCollector
 {
     use Backtracer;
 
-    /** @var SegmentWithPublicName[] */
+    /** @var NamedSegment[] */
     protected $segments = [];
 
     public function tracer(): Trace
@@ -81,68 +83,68 @@ class SegmentCollector
         $tracer->begin($this->getSampleRate());
     }
 
-    public function addSegment(string $name, ?float $startTime = null, ?array $metadata = null): Segment
+    public function addSegment(?SegmentConfig $config): Segment
     {
-        $segment = (new TimeSegment())->setName($name);
+        return $this->addCustomSegment(new TimeSegment(), $config);
+    }
 
-        if (null !== $metadata) {
-            $segment->addMetadata('info', $metadata);
-        }
+    public function addHttpSegment(?HttpSegmentConfig $config): HttpSegment
+    {
+        return $this->addCustomSegment(new HttpSegment(), $config);
+    }
 
-        $this->current()->addSubsegment($segment);
-        $segment->begin($startTime);
-        $this->segments[$segment->getId()] = new SegmentWithPublicName($segment, $name);
+    public function addCustomSegment(Segment $segment, ?SegmentConfig $config): Segment
+    {
+        $config->applyTo($segment);
+
+        $parent = $config->getParentSegment() ?? $this->current();
+        $parent->addSubsegment($segment);
+
+        $segment->begin($config->getStartTime());
+
+        $this->segments[$segment->getId()] = new NamedSegment(
+            $segment,
+            $config->getName()
+        );
 
         return $segment;
     }
 
-    public function addCustomSegment(Segment $segment, string $name): Segment
+    /**
+     * Get all segments with same name.
+     *
+     * @param string $name
+     * @return Segment[]
+     */
+    public function getSegmentByName(string $name): array
     {
-        $this->current()->addSubsegment($segment);
-        $segment->begin();
-        $this->segments[$segment->getId()] = new SegmentWithPublicName($segment, $name);
+        $result = [];
 
-        return $segment;
-    }
-
-    public function addHttpSegment(string $url, ?array $config = []): HttpSegment
-    {
-        $name = $config['name'] ?? $url;
-        $method = $config['method'] ?? 'GET';
-
-        $segment = (new HttpSegment())->setName($name)
-            ->setMethod($method)
-            ->setUrl($url)
-            ->begin();
-
-        $this->current()->addSubsegment($segment);
-        $this->segments[$segment->getId()] = new SegmentWithPublicName($segment, $name);
-
-        return $segment;
-    }
-
-    public function getSegment(string $name): ?Segment
-    {
         foreach ($this->segments as $key => $segment) {
-            if ($name == $segment->name) {
-                return $segment->segment;
+            if ($name === $segment->getName()) {
+                $result[] = $segment->getSegment();
             }
         }
 
-        return null;
+        return $result;
     }
 
+    /**
+     * Get specific segment by ID
+     *
+     * @param string $id
+     * @return Segment|null
+     */
     public function getSegmentById(string $id): ?Segment
     {
         return \array_key_exists($id, $this->segments)
-            ? $this->segments[$id]->segment
+            ? $this->segments[$id]->getSegment()
             : null;
     }
 
-    public function endSegment(string $name): void
+    public function endSegmentByName(string $name): void
     {
-        $segment = $this->getSegment($name);
-        if (!is_null($segment)) {
+        foreach ($this->getSegmentByName($name) as $segment) {
             $this->dropSegment($segment);
         }
     }
@@ -155,9 +157,13 @@ class SegmentCollector
         }
     }
 
-    public function hasAddedSegment(string $name): bool
+    public function nameExist(string $name): bool
     {
-        return !is_null($this->getSegment($name));
+        foreach ($this->segments as $key => $segment) {
+            if ($name === $segment->name) {
+                return true;
+            }
+        }
     }
 
     public function endCurrentSegment(): void
