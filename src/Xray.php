@@ -80,6 +80,11 @@ class Xray
         $this->collector->endSegmentById($id);
     }
 
+    public function endSegment(Segment $segment): void
+    {
+        $this->collector->endSegment($segment);
+    }
+
     public function nameExist(string $name): bool
     {
         return $this->collector->nameExist($name);

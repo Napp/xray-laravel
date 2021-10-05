@@ -179,10 +179,11 @@ class SegmentCollector
     public function nameExist(string $name): bool
     {
         foreach ($this->segments as $key => $segment) {
-            if ($name === $segment->name) {
+            if ($name === $segment->getName()) {
                 return true;
             }
         }
+        return false;
     }
 
     public function endCurrentSegment(): void

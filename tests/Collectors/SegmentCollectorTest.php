@@ -6,6 +6,8 @@ namespace Napp\Xray\Tests;
 
 use Illuminate\Http\Request;
 use Napp\Xray\Collectors\SegmentCollector;
+use Napp\Xray\Config\HttpSegmentConfig;
+use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -38,30 +40,101 @@ class SegmentCollectorTest extends TestCase
     {
         $collector = new SegmentCollector();
         $collector->current()->begin();
-        $segment = $collector->addHttpSegment('http://example.com', ['method' => 'POST', 'name' => 'example']);
+        $segment = $collector->addHttpSegment(new HttpSegmentConfig([
+            HttpSegmentConfig::NAME => 'example',
+            HttpSegmentConfig::METHOD => 'POST',
+            HttpSegmentConfig::URL => 'http://example.com',
+        ]));
 
-        $data = $collector->getSegment('example')->jsonSerialize();
+        $this->assertTrue($collector->nameExist('example'));
+        $this->assertNotEmpty($collector->getSegmentByName('example'));
+
+        $data = $collector->getSegmentById($segment->getId())->jsonSerialize();
         $this->assertEquals('POST', $data['http']['request']['method']);
         $this->assertEquals('http://example.com', $data['http']['request']['url']);
 
         $segment->setResponseCode(400);
 
-        $collector->endSegment('example');
+        $collector->endSegmentByName('example');
 
-        $this->assertNull($collector->getSegment('example'));
+        $this->assertEmpty($collector->getSegmentByName('example'));
 
         $data = $collector->current()->jsonSerialize()['subsegments'][0]->jsonSerialize();
         $this->assertEquals(400, $data['http']['response']['status']);
     }
 
-    public function test_end_empty_segments_wont_throw_exception()
+    public function test_should_apply_config_correctly()
     {
         $collector = new SegmentCollector();
-        $collector->endSegment('some-segment');
-        $collector->hasAddedSegment('some-segment');
-        $collector->getSegment('some-segment');
+        $collector->current()->begin();
+        $segment = $collector->addSegment(new SegmentConfig([
+            SegmentConfig::NAME        => 'example',
+            SegmentConfig::START_TIME  => 123,
+            SegmentConfig::ANNOTATIONS => [
+                'ann1' => 'ann1_value'
+            ],
+            SegmentConfig::METADATA    => [
+                'meta1' => 'meta1_value'
+            ],
+        ]));
 
-        $this->assertTrue(true);
+        $data = $collector->getSegmentById($segment->getId())->jsonSerialize();
+        $this->assertEquals('example', $data['name']);
+        $this->assertEquals('ann1_value', $data['annotations']['ann1']);
+        $this->assertEquals('meta1_value', $data['metadata']['meta1']);
+        $this->assertEquals(123, $data['start_time']);
+
+        $collector->endSegmentById($segment->getId());
+
+        $this->assertNull($collector->getSegmentById($segment->getId()));
+
+        $data = $collector->current()->jsonSerialize()['subsegments'][0]->jsonSerialize();
+        $this->assertNotNull($data['end_time']);
+    }
+
+    public function test_bind_same_parent_segment()
+    {
+        $collector = new SegmentCollector();
+        $trace = $collector->current()->begin();
+
+        $collector->addSegment(new SegmentConfig([
+            SegmentConfig::NAME           => 'segment1',
+            SegmentConfig::PARENT_SEGMENT => $trace,
+        ]));
+        $collector->addSegment(new SegmentConfig([
+            SegmentConfig::NAME           => 'segment2',
+            SegmentConfig::PARENT_SEGMENT => $trace,
+        ]));
+
+        $collector->endSegmentByName('segment1');
+        $collector->endSegmentByName('segment2');
+
+        $trace->end();
+
+        $this->assertEquals(count($trace->jsonSerialize()['subsegments']), 2);
+    }
+
+    public function test_bind_hierarchy()
+    {
+        $collector = new SegmentCollector();
+        $trace = $collector->current()->begin();
+
+        $collector->addSegment(new SegmentConfig([
+            SegmentConfig::NAME           => 'segment1',
+        ]));
+        $collector->addSegment(new SegmentConfig([
+            SegmentConfig::NAME           => 'segment2',
+        ]));
+
+        $collector->endSegmentByName('segment1');
+        $collector->endSegmentByName('segment2');
+
+        $trace->end();
+
+        $level1Segments = $trace->jsonSerialize()['subsegments'];
+        $this->assertEquals(count($level1Segments), 1);
+        $level2Segments = $level1Segments[0]->jsonSerialize()['subsegments'];
+        $this->assertEquals(count($level2Segments), 1);
     }
 
     public function test_handle_exception()
