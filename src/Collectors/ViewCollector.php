@@ -15,7 +15,7 @@ class ViewCollector extends EventsCollector
 
         $this->app['events']->listen('composing:*', function ($view, $data = []) {
             $viewName = substr($view, 11);
-            $this->endSegment('View ' . $viewName);
+            $this->endSegmentByName('View ' . $viewName);
         });
     }
 }

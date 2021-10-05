@@ -83,18 +83,30 @@ class SegmentCollector
         $tracer->begin($this->getSampleRate());
     }
 
-    public function addSegment(?SegmentConfig $config): Segment
+    /**
+     * @param SegmentConfig|string|null $configOrName
+     * @return Segment
+     */
+    public function addSegment($configOrName = null): Segment
     {
+        $config = is_string($configOrName)
+            ? new SegmentConfig([SegmentConfig::NAME => $configOrName])
+            : $configOrName;
+
         return $this->addCustomSegment(new TimeSegment(), $config);
     }
 
-    public function addHttpSegment(?HttpSegmentConfig $config): HttpSegment
+    public function addHttpSegment(?HttpSegmentConfig $config = null): HttpSegment
     {
         return $this->addCustomSegment(new HttpSegment(), $config);
     }
 
     public function addCustomSegment(Segment $segment, ?SegmentConfig $config): Segment
     {
+        if (is_null($config)) {
+           $config = new SegmentConfig();
+        }
+
         $config->applyTo($segment);
 
         $parent = $config->getParentSegment() ?? $this->current();
@@ -145,7 +157,7 @@ class SegmentCollector
     public function endSegmentByName(string $name): void
     {
         foreach ($this->getSegmentByName($name) as $segment) {
-            $this->dropSegment($segment);
+            $this->endSegment($segment);
         }
     }
 
@@ -153,8 +165,15 @@ class SegmentCollector
     {
         $segment = $this->getSegmentById($id);
         if (!is_null($segment)) {
-            $this->dropSegment($segment);
+            $this->endSegment($segment);
         }
+    }
+
+    public function endSegment(Segment $segment)
+    {
+        $segment->end();
+
+        unset($this->segments[$segment->getId()]);
     }
 
     public function nameExist(string $name): bool
@@ -220,12 +239,5 @@ class SegmentCollector
         if (!config('xray.ignore_error')) {
             throw $e;
         }
-    }
-
-    protected function dropSegment(Segment $segment)
-    {
-        $segment->end();
-
-        unset($this->segments[$segment->getId()]);
     }
 }

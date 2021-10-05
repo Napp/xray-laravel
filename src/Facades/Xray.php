@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Napp\Xray\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Napp\Xray\Config\HttpSegmentConfig;
+use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
@@ -14,12 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
  * @method static Trace tracer()
  * @method static Segment current()
  * @method static bool isEnabled()
- * @method static Segment addSegment(string $name, ?float $startTime = null, ?array $metadata = null)
- * @method static HttpSegment addHttpSegment(string $name, ?array $config = [])
- * @method static Segment addCustomSegment(Segment $segment, string $name)
- * @method static null|Segment getSegment(string $name)
- * @method static void endSegment(string $name)
- * @method static bool hasAddedSegment(string $name)
+ * @method static Segment addSegment(?SegmentConfig $config = null)
+ * @method static HttpSegment addHttpSegment(?HttpSegmentConfig $config = null)
+ * @method static Segment addCustomSegment(Segment $segment, SegmentConfig $config)
+ * @method static Segment[] getSegmentByName(string $name)
+ * @method static null|Segment getSegmentById(string $id)
+ * @method static void endSegmentByName(string $name)
+ * @method static void endSegmentById(string $id)
+ * @method static bool nameExist(string $name)
  * @method static void endCurrentSegment()
  * @method static void initHttpTracer(Request $request)
  * @method static void initCliTracer(string $name)

@@ -37,17 +37,21 @@ class Xray
         return $this->collector->isTracerEnabled();
     }
 
-    public function addSegment(?SegmentConfig $config): Segment
+    /**
+     * @param SegmentConfig|string|null $configOrName
+     * @return Segment
+     */
+    public function addSegment($config = null): Segment
     {
         return $this->collector->addSegment($config);
     }
 
-    public function addHttpSegment(?HttpSegmentConfig $config): HttpSegment
+    public function addHttpSegment(?HttpSegmentConfig $config = null): HttpSegment
     {
         return $this->collector->addHttpSegment($config);
     }
 
-    public function addCustomSegment(Segment $segment, ?SegmentConfig $config): Segment
+    public function addCustomSegment(Segment $segment, ?SegmentConfig $config = null): Segment
     {
         return $this->collector->addCustomSegment($segment, $config);
     }

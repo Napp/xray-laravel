@@ -18,10 +18,11 @@ class RouteCollector extends EventsCollector
         // Time between route resolution and request handled
         $this->app['events']->listen(RouteMatched::class, function ($event) {
             // end the segment first avoid missing end time
-            $this->endSegment('route matching');
+            $this->endSegmentByName('route matching');
             try {
                 $this->addSegment('request handled')
-                    ->addAnnotation('controller', $this->getController());
+                    ->addAnnotation('controller', $this->getController())
+                    ->end();
             } catch (\Exception $e) {
                 $this->handleException($e);
             }
@@ -29,8 +30,8 @@ class RouteCollector extends EventsCollector
 
         $this->app['events']->listen(RequestHandled::class, function () {
             // close segment if not founding any route
-            $this->endSegment('route matching');
-            $this->endSegment('request handled');
+            $this->endSegmentByName('route matching');
+            $this->endSegmentByName('request handled');
         });
     }
 

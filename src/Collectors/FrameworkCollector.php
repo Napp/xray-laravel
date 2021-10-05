@@ -13,7 +13,7 @@ class FrameworkCollector extends EventsCollector
         $this->addSegment('laravel boot');
 
         $this->app->booted(function () {
-            $this->endSegment('laravel boot');
+            $this->endSegmentByName('laravel boot');
         });
     }
 }
