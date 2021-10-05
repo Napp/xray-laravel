@@ -21,8 +21,7 @@ class RouteCollector extends EventsCollector
             $this->endSegment('route matching');
             try {
                 $this->addSegment('request handled')
-                    ->addAnnotation('controller', $this->getController())
-                    ->end();
+                    ->addAnnotation('controller', $this->getController());
             } catch (\Exception $e) {
                 $this->handleException($e);
             }
