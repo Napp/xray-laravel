@@ -129,9 +129,4 @@ class SegmentConfig
     {
         return $this->config[SegmentConfig::START_TIME] ?? null;
     }
-
-    public function getName(): ?string
-    {
-        return $this->config[SegmentConfig::NAME] ?? null;
-    }
 }

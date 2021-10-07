@@ -21,23 +21,18 @@ class XrayTest extends TestCase
         $xray = new Xray($collector);
 
         $collector->expects($this->once())->method('tracer');
-        $collector->expects($this->once())->method('current');
-        $collector->expects($this->once())->method('isTracerEnabled');
-        $collector->expects($this->once())->method('addSegment')->with('name');
+        $collector->expects($this->once())->method('getCurrentSegment');
+        $collector->expects($this->once())->method('endCurrentSegment');
+        $collector->expects($this->once())->method('isEnabled');
+        $collector->expects($this->once())->method('addSegment');
         $collector->expects($this->once())->method('addCustomSegment')->with($segment, $this->anything());
         $collector->expects($this->once())->method('addHttpSegment')->with($this->anything());
-        $collector->expects($this->once())->method('getSegmentByName')->with('name');
-        $collector->expects($this->once())->method('getSegmentById')->with($segment->getId());
-        $collector->expects($this->once())->method('endSegmentById')->with($segment->getId());
-        $collector->expects($this->once())->method('endSegmentByName')->with('name');
-        $collector->expects($this->once())->method('endSegment')->with($segment);
-        $collector->expects($this->once())->method('nameExist')->with('name');
-        $collector->expects($this->once())->method('endCurrentSegment');
 
         $xray->tracer();
-        $xray->current();
+        $xray->getCurrentSegment();
+        $xray->endCurrentSegment();
         $xray->isEnabled();
-        $xray->addSegment('name');
+        $xray->addSegment();
         $xray->addCustomSegment($segment, new SegmentConfig([
             SegmentConfig::NAME        => 'name',
             SegmentConfig::START_TIME  => 0,
@@ -54,12 +49,5 @@ class XrayTest extends TestCase
             HttpSegmentConfig::METHOD         => 'method',
             HttpSegmentConfig::PARENT_SEGMENT => $segment,
         ]));
-        $xray->getSegmentByName('name');
-        $xray->getSegmentById($segment->getId());
-        $xray->endSegmentById($segment->getId());
-        $xray->endSegmentByName('name');
-        $xray->endSegment($segment);
-        $xray->nameExist('name');
-        $xray->endCurrentSegment();
     }
 }

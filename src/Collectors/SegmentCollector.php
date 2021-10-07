@@ -81,22 +81,14 @@ class SegmentCollector
     {
         $segment = new TimeSegment();
 
-        if (!is_null($config)) {
-            $config->applyTo($segment);
-        }
-
-        return $this->addCustomSegment($segment);
+        return $this->addCustomSegment($segment, $config);
     }
 
     public function addHttpSegment(?HttpSegmentConfig $config = null): HttpSegment
     {
         $segment = new HttpSegment();
 
-        if (!is_null($config)) {
-            $config->applyTo($segment);
-        }
-
-        return $this->addCustomSegment($segment);
+        return $this->addCustomSegment($segment, $config);
     }
 
     public function addCustomSegment(Segment $segment, ?SegmentConfig $config = null): Segment

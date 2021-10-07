@@ -36,37 +36,25 @@ class SegmentCollectorTest extends TestCase
         $this->assertTrue($segment->tracer()->isSampled());
     }
 
-    public function test_should_add_http_segment()
+    public function test_add_http_segment()
     {
-        $collector = new SegmentCollector();
-        $collector->current()->begin();
+        $collector = $this->setupCollector();
         $segment = $collector->addHttpSegment(new HttpSegmentConfig([
             HttpSegmentConfig::NAME => 'example',
             HttpSegmentConfig::METHOD => 'POST',
             HttpSegmentConfig::URL => 'http://example.com',
-        ]));
+        ]))->setResponseCode(400)->end();
 
-        $this->assertTrue($collector->nameExist('example'));
-        $this->assertNotEmpty($collector->getSegmentByName('example'));
-
-        $data = $collector->getSegmentById($segment->getId())->jsonSerialize();
+        $data = $segment->jsonSerialize();
+        $this->assertEquals('example', $data['name']);
         $this->assertEquals('POST', $data['http']['request']['method']);
         $this->assertEquals('http://example.com', $data['http']['request']['url']);
-
-        $segment->setResponseCode(400);
-
-        $collector->endSegmentByName('example');
-
-        $this->assertEmpty($collector->getSegmentByName('example'));
-
-        $data = $collector->current()->jsonSerialize()['subsegments'][0]->jsonSerialize();
         $this->assertEquals(400, $data['http']['response']['status']);
     }
 
-    public function test_should_apply_config_correctly()
+    public function test_add_segment()
     {
-        $collector = new SegmentCollector();
-        $collector->current()->begin();
+        $collector = $this->setupCollector();
         $segment = $collector->addSegment(new SegmentConfig([
             SegmentConfig::NAME        => 'example',
             SegmentConfig::START_TIME  => 123,
@@ -76,62 +64,50 @@ class SegmentCollectorTest extends TestCase
             SegmentConfig::METADATA    => [
                 'meta1' => 'meta1_value'
             ],
-        ]));
+        ]))->end();
 
-        $data = $collector->getSegmentById($segment->getId())->jsonSerialize();
+        $data = $segment->jsonSerialize();
         $this->assertEquals('example', $data['name']);
         $this->assertEquals('ann1_value', $data['annotations']['ann1']);
         $this->assertEquals('meta1_value', $data['metadata']['meta1']);
         $this->assertEquals(123, $data['start_time']);
-
-        $collector->endSegmentById($segment->getId());
-
-        $this->assertNull($collector->getSegmentById($segment->getId()));
-
-        $data = $collector->current()->jsonSerialize()['subsegments'][0]->jsonSerialize();
         $this->assertNotNull($data['end_time']);
     }
 
     public function test_bind_same_parent_segment()
     {
-        $collector = new SegmentCollector();
-        $trace = $collector->current()->begin();
+        $collector = $this->setupCollector();
+        $parent = $collector->getCurrentSegment();
 
-        $collector->addSegment(new SegmentConfig([
+        $segment1 = $collector->addSegment(new SegmentConfig([
             SegmentConfig::NAME           => 'segment1',
-            SegmentConfig::PARENT_SEGMENT => $trace,
+            SegmentConfig::PARENT_SEGMENT => $parent,
         ]));
-        $collector->addSegment(new SegmentConfig([
+        $segment2 = $collector->addSegment(new SegmentConfig([
             SegmentConfig::NAME           => 'segment2',
-            SegmentConfig::PARENT_SEGMENT => $trace,
+            SegmentConfig::PARENT_SEGMENT => $parent,
         ]));
 
-        $collector->endSegmentByName('segment1');
-        $collector->endSegmentByName('segment2');
+        $segment1->end();
+        $segment2->end();
 
-        $trace->end();
-
-        $this->assertEquals(count($trace->jsonSerialize()['subsegments']), 2);
+        $subsegments = $parent->jsonSerialize()['subsegments'];
+        $this->assertEquals(count($subsegments), 2);
     }
 
     public function test_bind_hierarchy()
     {
-        $collector = new SegmentCollector();
-        $trace = $collector->current()->begin();
+        $collector = $this->setupCollector();
+        $parent = $collector->getCurrentSegment();
 
-        $collector->addSegment(new SegmentConfig([
-            SegmentConfig::NAME           => 'segment1',
-        ]));
-        $collector->addSegment(new SegmentConfig([
-            SegmentConfig::NAME           => 'segment2',
-        ]));
+        $segment1 = $collector->addSegment();
+        $segment2 = $collector->addSegment();
 
-        $collector->endSegmentByName('segment1');
-        $collector->endSegmentByName('segment2');
+        $segment1->end();
+        $segment2->end();
+        $collector->endCurrentSegment();
 
-        $trace->end();
-
-        $level1Segments = $trace->jsonSerialize()['subsegments'];
+        $level1Segments = $parent->jsonSerialize()['subsegments'];
         $this->assertEquals(count($level1Segments), 1);
         $level2Segments = $level1Segments[0]->jsonSerialize()['subsegments'];
         $this->assertEquals(count($level2Segments), 1);
@@ -142,11 +118,11 @@ class SegmentCollectorTest extends TestCase
         // should not rethrow exception
         $this->app['config']->set('xray.ignore_error', true);
         $exception =  new \Exception('message', 0);
-        $collector = new SegmentCollector();
+        $collector = $this->setupCollector();
 
         $collector->handleException($exception);
 
-        $serialized = $collector->current()->jsonSerialize();
+        $serialized = $collector->getCurrentSegment()->jsonSerialize();
         $this->assertEquals('message', $serialized['annotations']['xrayError']);
         $this->assertNotEmpty(($serialized['metadata']['xrayDatabaseQueryTrace']));
 
@@ -155,17 +131,6 @@ class SegmentCollectorTest extends TestCase
         $this->expectException(\Exception::class);
 
         $collector->handleException($exception);
-    }
-
-    protected function createRequest()
-    {
-        $request = $this->createMock(Request::class);
-
-        $request->expects($this->any())->method('ip')->willReturn('some-ip');
-        $request->expects($this->any())->method('url')->willReturn('some-url');
-        $request->expects($this->any())->method('method')->willReturn('GET');
-
-        return $request;
     }
 
     /**
@@ -186,5 +151,23 @@ class SegmentCollectorTest extends TestCase
         parent::setUp();
 
         Trace::flush();
+    }
+
+    private function createRequest()
+    {
+        $request = $this->createMock(Request::class);
+
+        $request->expects($this->any())->method('ip')->willReturn('some-ip');
+        $request->expects($this->any())->method('url')->willReturn('some-url');
+        $request->expects($this->any())->method('method')->willReturn('GET');
+
+        return $request;
+    }
+
+    private function setupCollector(): SegmentCollector {
+        $collector = new SegmentCollector();
+        $collector->getCurrentSegment()->begin();
+
+        return $collector;
     }
 }

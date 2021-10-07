@@ -25,11 +25,10 @@ class DatabaseQueryCollectorTest extends TestCase
             ->willReturn('driver-name');
         $connection->expects($this->never())->method('prepareBindings');
 
-        $collector = new DatabaseQueryCollector($this->app);
-        $collector->current()->begin();
+        $collector = $this->setupCollector();
         $collector->handleQueryReport('abc ? def ? ?', [1, 2], 0, $connection);
 
-        $serialized = $collector->current()->jsonSerialize();
+        $serialized = $collector->getCurrentSegment()->jsonSerialize();
         $querySerialized = $serialized['subsegments'][0]->jsonSerialize();
 
         $this->assertEquals('name', $querySerialized['name']);
@@ -53,11 +52,10 @@ class DatabaseQueryCollectorTest extends TestCase
             ->method('prepareBindings')
             ->willReturn([123, 'ghi']);
 
-        $collector = new DatabaseQueryCollector($this->app);
-        $collector->current()->begin();
+        $collector = $this->setupCollector();
         $collector->handleQueryReport('abc ? def ?', [1, 2], 0, $connection);
 
-        $serialized = $collector->current()->jsonSerialize();
+        $serialized = $collector->getCurrentSegment()->jsonSerialize();
         $querySerialized = $serialized['subsegments'][0]->jsonSerialize();
 
         $this->assertEquals("abc 123 def 'ghi'", $querySerialized['sql']['sanitized_query']);
@@ -77,11 +75,10 @@ class DatabaseQueryCollectorTest extends TestCase
             ->willReturn('driver-name');
         $connection->expects($this->never())->method('prepareBindings');
 
-        $collector = new DatabaseQueryCollector($this->app);
-        $collector->current()->begin();
+        $collector = $this->setupCollector();
         $collector->handleQueryReport('abc ? def ?', [1, 2], 0, $connection);
 
-        $serialized = $collector->current()->jsonSerialize();
+        $serialized = $collector->getCurrentSegment()->jsonSerialize();
         $querySerialized = $serialized['subsegments'][0]->jsonSerialize();
 
         $this->assertFalse(isset($querySerialized['sql']['sanitized_query']));
@@ -92,5 +89,12 @@ class DatabaseQueryCollectorTest extends TestCase
         parent::setUp();
 
         Trace::flush();
+    }
+
+    private function setupCollector(): DatabaseQueryCollector {
+        $collector = new DatabaseQueryCollector($this->app);
+        $collector->getCurrentSegment()->begin();
+
+        return $collector;
     }
 }
