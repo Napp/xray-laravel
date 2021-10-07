@@ -14,16 +14,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @method static Trace tracer()
- * @method static Segment current()
+ * @method static Segment getCurrentSegment()
  * @method static bool isEnabled()
  * @method static Segment addSegment(?SegmentConfig $config = null)
  * @method static HttpSegment addHttpSegment(?HttpSegmentConfig $config = null)
- * @method static Segment addCustomSegment(Segment $segment, SegmentConfig $config)
- * @method static Segment[] getSegmentByName(string $name)
- * @method static null|Segment getSegmentById(string $id)
- * @method static void endSegmentByName(string $name)
- * @method static void endSegmentById(string $id)
- * @method static bool nameExist(string $name)
+ * @method static Segment addCustomSegment(Segment $segment, ?SegmentConfig $config = null)
  * @method static void endCurrentSegment()
  * @method static void initHttpTracer(Request $request)
  * @method static void initCliTracer(string $name)

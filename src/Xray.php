@@ -27,21 +27,17 @@ class Xray
         return $this->collector->tracer();
     }
 
-    public function current(): Segment
+    public function getCurrentSegment(): Segment
     {
-        return $this->collector->current();
+        return $this->collector->getCurrentSegment();
     }
 
     public function isEnabled(): bool
     {
-        return $this->collector->isTracerEnabled();
+        return $this->collector->isEnabled();
     }
 
-    /**
-     * @param SegmentConfig|string|null $configOrName
-     * @return Segment
-     */
-    public function addSegment($config = null): Segment
+    public function addSegment(?SegmentConfig $config = null): Segment
     {
         return $this->collector->addSegment($config);
     }
@@ -54,40 +50,6 @@ class Xray
     public function addCustomSegment(Segment $segment, ?SegmentConfig $config = null): Segment
     {
         return $this->collector->addCustomSegment($segment, $config);
-    }
-
-    /**
-     * @param string $name
-     * @return Segment[]
-     */
-    public function getSegmentByName(string $name): array
-    {
-        return $this->collector->getSegmentByName($name);
-    }
-
-    public function getSegmentById(string $id): ?Segment
-    {
-        return $this->collector->getSegmentById($id);
-    }
-
-    public function endSegmentByName(string $name): void
-    {
-        $this->collector->endSegmentByName($name);
-    }
-
-    public function endSegmentById(string $id): void
-    {
-        $this->collector->endSegmentById($id);
-    }
-
-    public function endSegment(Segment $segment): void
-    {
-        $this->collector->endSegment($segment);
-    }
-
-    public function nameExist(string $name): bool
-    {
-        return $this->collector->nameExist($name);
     }
 
     public function endCurrentSegment(): void

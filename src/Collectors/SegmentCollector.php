@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Napp\Xray\Config\HttpSegmentConfig;
 use Napp\Xray\Config\SegmentConfig;
-use Napp\Xray\Segments\NamedSegment;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
@@ -19,20 +18,17 @@ class SegmentCollector
 {
     use Backtracer;
 
-    /** @var NamedSegment[] */
-    protected $segments = [];
-
     public function tracer(): Trace
     {
         return Trace::getInstance();
     }
 
-    public function current(): Segment
+    public function getCurrentSegment(): Segment
     {
         return $this->tracer()->getCurrentSegment();
     }
 
-    public function isTracerEnabled(): bool
+    public function isEnabled(): bool
     {
         return (bool) config('xray.enabled');
     }
@@ -49,11 +45,10 @@ class SegmentCollector
 
     public function initHttpTracer(Request $request): void
     {
-        if (!$this->isTracerEnabled()) {
+        if (!$this->isEnabled()) {
             return;
         }
 
-        $this->segments = [];
         $tracer = $this->tracer()
             ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
             ->setName(config('xray.name') ?? config('app.name'))
@@ -71,11 +66,10 @@ class SegmentCollector
 
     public function initCliTracer(string $name): void
     {
-        if (!$this->isTracerEnabled()) {
+        if (!$this->isEnabled()) {
             return;
         }
 
-        $this->segments = [];
         $tracer = $this->tracer()
             ->setName((config('xray.name') ?? config('app.name')) . ' CLI')
             ->setUrl($name);
@@ -83,25 +77,29 @@ class SegmentCollector
         $tracer->begin($this->getSampleRate());
     }
 
-    /**
-     * @param SegmentConfig|string|null $configOrName
-     * @return Segment
-     */
-    public function addSegment($configOrName = null): Segment
+    public function addSegment(?SegmentConfig $config = null): Segment
     {
-        $config = is_string($configOrName)
-            ? new SegmentConfig([SegmentConfig::NAME => $configOrName])
-            : $configOrName;
+        $segment = new TimeSegment();
 
-        return $this->addCustomSegment(new TimeSegment(), $config);
+        if (!is_null($config)) {
+            $config->applyTo($segment);
+        }
+
+        return $this->addCustomSegment($segment);
     }
 
     public function addHttpSegment(?HttpSegmentConfig $config = null): HttpSegment
     {
-        return $this->addCustomSegment(new HttpSegment(), $config);
+        $segment = new HttpSegment();
+
+        if (!is_null($config)) {
+            $config->applyTo($segment);
+        }
+
+        return $this->addCustomSegment($segment);
     }
 
-    public function addCustomSegment(Segment $segment, ?SegmentConfig $config): Segment
+    public function addCustomSegment(Segment $segment, ?SegmentConfig $config = null): Segment
     {
         if (is_null($config)) {
            $config = new SegmentConfig();
@@ -109,86 +107,15 @@ class SegmentCollector
 
         $config->applyTo($segment);
 
-        $parent = $config->getParentSegment() ?? $this->current();
+        $parent = $config->getParentSegment() ?? $this->getCurrentSegment();
         $parent->addSubsegment($segment);
 
-        $segment->begin($config->getStartTime());
-
-        $this->segments[$segment->getId()] = new NamedSegment(
-            $segment,
-            $config->getName()
-        );
-
-        return $segment;
-    }
-
-    /**
-     * Get all segments with same name.
-     *
-     * @param string $name
-     * @return Segment[]
-     */
-    public function getSegmentByName(string $name): array
-    {
-        $result = [];
-
-        foreach ($this->segments as $key => $segment) {
-            if ($name === $segment->getName()) {
-                $result[] = $segment->getSegment();
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get specific segment by ID
-     *
-     * @param string $id
-     * @return Segment|null
-     */
-    public function getSegmentById(string $id): ?Segment
-    {
-        return \array_key_exists($id, $this->segments)
-            ? $this->segments[$id]->getSegment()
-            : null;
-    }
-
-    public function endSegmentByName(string $name): void
-    {
-        foreach ($this->getSegmentByName($name) as $segment) {
-            $this->endSegment($segment);
-        }
-    }
-
-    public function endSegmentById(string $id): void
-    {
-        $segment = $this->getSegmentById($id);
-        if (!is_null($segment)) {
-            $this->endSegment($segment);
-        }
-    }
-
-    public function endSegment(Segment $segment)
-    {
-        $segment->end();
-
-        unset($this->segments[$segment->getId()]);
-    }
-
-    public function nameExist(string $name): bool
-    {
-        foreach ($this->segments as $key => $segment) {
-            if ($name === $segment->getName()) {
-                return true;
-            }
-        }
-        return false;
+        return $segment->begin($config->getStartTime());
     }
 
     public function endCurrentSegment(): void
     {
-        $this->current()->end();
+        $this->getCurrentSegment()->end();
     }
 
     public function submitHttpTracer($response): void
@@ -234,9 +161,10 @@ class SegmentCollector
     public function handleException(\Exception $e)
     {
         Log::warning($e->getMessage(), ['exception' => $e]);
-        $this->current()
+        $this->getCurrentSegment()
             ->addAnnotation('xrayError', $e->getMessage())
             ->addMetadata('xrayDatabaseQueryTrace', $e->getTraceAsString());
+
         if (!config('xray.ignore_error')) {
             throw $e;
         }

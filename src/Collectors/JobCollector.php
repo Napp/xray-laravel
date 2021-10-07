@@ -14,19 +14,19 @@ use Napp\Xray\Segments\JobSegment;
 
 class JobCollector extends EventsCollector
 {
+    /** @var JobSegment  */
+    protected $segment;
+
     public function registerEventListeners(): void
     {
         $this->app['events']->listen(JobProcessing::class, function (JobProcessing $event) {
             $this->initCliTracer($event->job->resolveName());
 
-            $segment = $this->addCustomSegment(
+            $this->segment = $this->addCustomSegment(
                 (new JobSegment())->setPayload($event->job->payload()),
                 new SegmentConfig([
-                    SegmentConfig::NAME => $this->getJobId($event->job)
+                    SegmentConfig::NAME => $event->job->resolveName(),
                 ]));
-
-            // override the name of job
-            $segment->setName($event->job->resolveName());
         });
 
         $this->app['events']->listen(JobProcessed::class, function (JobProcessed $event) {
@@ -42,21 +42,11 @@ class JobCollector extends EventsCollector
         });
     }
 
-    protected function getJobId(Job $job): string
-    {
-        if ($jobId = $job->getJobId()) {
-            return $jobId;
-        }
-
-        return sha1($job->getRawBody());
-    }
-
     public function handleJobEnded(Job $job, bool $success = false): void
     {
-        foreach ($this->getSegmentByName($this->getJobId($job)) as $segment) {
-            $segment->setError($success);
-            $this->endSegment($segment);
-        }
+        $this->segment
+            ->setError($success)
+            ->end();
 
         $this->submitCliTracer();
     }
