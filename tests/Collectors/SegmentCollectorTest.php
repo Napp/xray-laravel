@@ -57,7 +57,6 @@ class SegmentCollectorTest extends TestCase
         $collector = $this->setupCollector();
         $segment = $collector->addSegment(new SegmentConfig([
             SegmentConfig::NAME        => 'example',
-            SegmentConfig::START_TIME  => 123,
             SegmentConfig::ANNOTATIONS => [
                 'ann1' => 'ann1_value'
             ],
@@ -70,7 +69,6 @@ class SegmentCollectorTest extends TestCase
         $this->assertEquals('example', $data['name']);
         $this->assertEquals('ann1_value', $data['annotations']['ann1']);
         $this->assertEquals('meta1_value', $data['metadata']['meta1']);
-        $this->assertEquals(123, $data['start_time']);
         $this->assertNotNull($data['end_time']);
     }
 

@@ -8,13 +8,6 @@ use Pkerrigan\Xray\SqlSegment as BaseSegment;
 
 class SqlSegment extends BaseSegment
 {
-    public function begin(?float $startTime = null)
-    {
-        $this->startTime = $startTime ?? microtime(true);
-
-        return $this;
-    }
-
     public function end(?float $timeSpend = null)
     {
         if (is_null($timeSpend)) {

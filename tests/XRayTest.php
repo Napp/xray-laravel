@@ -7,16 +7,16 @@ namespace Napp\Xray\Tests;
 use Napp\Xray\Collectors\SegmentCollector;
 use Napp\Xray\Config\HttpSegmentConfig;
 use Napp\Xray\Config\SegmentConfig;
-use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Xray;
 use PHPUnit\Framework\TestCase;
+use Pkerrigan\Xray\Segment;
 
 class XrayTest extends TestCase
 {
     public function test_should_pass_all_functions()
     {
         $collector = $this->createMock(SegmentCollector::class);
-        $segment = new TimeSegment();
+        $segment = new Segment();
 
         $xray = new Xray($collector);
 
@@ -35,7 +35,6 @@ class XrayTest extends TestCase
         $xray->addSegment();
         $xray->addCustomSegment($segment, new SegmentConfig([
             SegmentConfig::NAME        => 'name',
-            SegmentConfig::START_TIME  => 0,
             SegmentConfig::ANNOTATIONS => [
                 'key1' => 'ann1'
             ],

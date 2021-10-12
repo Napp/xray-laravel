@@ -11,13 +11,6 @@ class SegmentConfig
     const NAME = 'name';
 
     /**
-     * Customize segment start time
-     *
-     * Should be `float` value.
-     */
-    const START_TIME = 'startTime';
-
-    /**
      * Segment annotations.
      *
      * Should be key-value string array.
@@ -123,10 +116,5 @@ class SegmentConfig
     public function getParentSegment(): ?Segment
     {
         return $this->config[SegmentConfig::PARENT_SEGMENT] ?? null;
-    }
-
-    public function getStartTime(): ?float
-    {
-        return $this->config[SegmentConfig::START_TIME] ?? null;
     }
 }

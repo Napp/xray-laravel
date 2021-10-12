@@ -32,26 +32,12 @@ class SqlSegmentTest extends TestCase
         $this->assertEquals('pgsql://test@localhost', $serialized['sql']['url']);
     }
 
-    public function test_setting_start_and_end_time()
-    {
-        $segment = new SqlSegment();
-        $segment->setDatabaseType('MySQL')
-            ->setQuery('SELECT *')
-            ->begin(1584448767.5)
-            ->end(1);
-
-        $serialized = $segment->jsonSerialize();
-
-        $this->assertEquals(1584448766.5, $serialized['start_time']);
-        $this->assertEquals(1584448767.5, $serialized['end_time']);
-    }
-
     public function test_setting_end_time()
     {
         $segment = new SqlSegment();
         $segment->setDatabaseType('MySQL')
             ->setQuery('SELECT *')
-            ->begin(1584448767.5);
+            ->begin();
 
         // wait
         sleep(1);
@@ -61,7 +47,10 @@ class SqlSegmentTest extends TestCase
 
         $serialized = $segment->jsonSerialize();
 
-        $this->assertEquals(1584448767.4, $serialized['start_time']);
-        $this->assertEquals(1584448767.5, $serialized['end_time']);
+        $this->assertEqualsWithDelta(
+            0.1,
+            $serialized['end_time'] - $serialized['start_time'],
+            0.001
+        );
     }
 }

@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Napp\Xray\Config\HttpSegmentConfig;
 use Napp\Xray\Config\SegmentConfig;
-use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
@@ -79,7 +78,7 @@ class SegmentCollector
 
     public function addSegment(?SegmentConfig $config = null): Segment
     {
-        $segment = new TimeSegment();
+        $segment = new Segment();
 
         return $this->addCustomSegment($segment, $config);
     }
@@ -102,7 +101,7 @@ class SegmentCollector
         $parent = $config->getParentSegment() ?? $this->getCurrentSegment();
         $parent->addSubsegment($segment);
 
-        return $segment->begin($config->getStartTime());
+        return $segment->begin();
     }
 
     public function endCurrentSegment(): void
