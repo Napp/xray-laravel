@@ -8,39 +8,70 @@ use Pkerrigan\Xray\Segment;
 
 class SegmentConfig
 {
-    const NAME = 'name';
+    /**
+     * @var string|null
+     */
+    protected $name;
 
     /**
-     * Segment annotations.
+     * Key-value string array for annotations
      *
-     * Should be key-value string array.
+     * @var string[]|null
+     */
+    protected $annotations;
+
+    /**
+     *
+     * @var string[]|null
+     */
+    protected $metadata;
+
+    /**
+     * @var Segment|null
+     */
+    protected $parent;
+
+    public function __construct(?string $name = null) {
+        $this->name = $name;
+    }
+
+    /**
+     * Key-value string array for annotations.
+     *
      * ```
-     * <?php
      * [
      *   'userId'   => $user->id,
      *   'userName' => $user->name,
      * ]
-     * ?>
      * ```
+     *
+     * @param string[] $annotations
+     * @return static
      */
-    const ANNOTATIONS = 'annotations';
+    public function setAnnotations(array $annotations) {
+        $this->annotations = $annotations;
+        return $this;
+    }
 
     /**
-     * Segment metadata.
+     * Key-value string array for metadata.
      *
-     * Should be key-value string array.
      * ```
-     * <?php
      * [
      *   'backtrace' => $error->backtrace,
      * ]
-     * ?>
      * ```
+     *
+     * @param string[] $metadata
+     * @return static
      */
-    const METADATA = 'metadata';
+    public function setMetadata(array $metadata) {
+        $this->metadata = $metadata;
+        return $this;
+    }
 
     /**
-     * Specify subsegment parent.
+     * Specify parent segment to avoid nested structure
      *
      * If not provided, it will use first unclosed segment as parent. It is
      * useful when you need to add multiple segments as async process.
@@ -80,41 +111,34 @@ class SegmentConfig
      * |
      * | |--- D -----
      * ```
+     *
+     * @param Segment $segment
+     * @return static
      */
-    const PARENT_SEGMENT = 'fixedParent';
+    public function setParent(Segment $segment) {
+        $this->parent = $segment;
+        return $this;
+    }
 
-    /**
-     * @var array
-     */
-    protected $config;
-
-    public function __construct(array $config = []) {
-        $this->config = $config;
+    public function getParent(): ?Segment
+    {
+        return $this->parent;
     }
 
     public function applyTo(Segment $segment)
     {
-        if (isset($this->config[SegmentConfig::NAME])) {
-            $segment->setName($this->config[SegmentConfig::NAME]);
+        if (isset($this->name)) {
+            $segment->setName($this->name);
         }
-        if (isset($this->config[SegmentConfig::METADATA])) {
-            foreach ($this->config[SegmentConfig::METADATA] as $key => $value) {
-                if (is_string($key) && is_string($value)) {
-                    $segment->addMetadata($key, $value);
-                }
+        if (isset($this->metadata)) {
+            foreach ($this->metadata as $key => $value) {
+                $segment->addMetadata($key, $value);
             }
         }
-        if (isset($this->config[SegmentConfig::ANNOTATIONS])) {
-            foreach ($this->config[SegmentConfig::ANNOTATIONS] as $key => $value) {
-                if (is_string($key) && is_string($value)) {
-                    $segment->addAnnotation($key, $value);
-                }
+        if (isset($this->annotations)) {
+            foreach ($this->annotations as $key => $value) {
+                $segment->addAnnotation($key, $value);
             }
         }
-    }
-
-    public function getParentSegment(): ?Segment
-    {
-        return $this->config[SegmentConfig::PARENT_SEGMENT] ?? null;
     }
 }

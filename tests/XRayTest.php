@@ -33,20 +33,10 @@ class XrayTest extends TestCase
         $xray->endCurrentSegment();
         $xray->isEnabled();
         $xray->addSegment();
-        $xray->addCustomSegment($segment, new SegmentConfig([
-            SegmentConfig::NAME        => 'name',
-            SegmentConfig::ANNOTATIONS => [
-                'key1' => 'ann1'
-            ],
-            SegmentConfig::METADATA    => [
-                'key1' => 'meta1'
-            ],
-        ]));
-        $xray->addHttpSegment(new HttpSegmentConfig([
-            HttpSegmentConfig::NAME           => 'name',
-            HttpSegmentConfig::URL            => 'url',
-            HttpSegmentConfig::METHOD         => 'method',
-            HttpSegmentConfig::PARENT_SEGMENT => $segment,
-        ]));
+        $xray->addCustomSegment($segment, (new SegmentConfig('name'))
+            ->setAnnotations(['key1' => 'ann1'])
+            ->setMetadata(['key1' => 'meta1'])
+        );
+        $xray->addHttpSegment(new HttpSegmentConfig('name', 'url', 'method'));
     }
 }

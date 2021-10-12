@@ -9,9 +9,25 @@ use Pkerrigan\Xray\HttpSegment;
 
 class HttpSegmentConfig extends SegmentConfig
 {
-    const URL = 'url';
+    /**
+     * @var string|null
+     */
+    protected $url;
 
-    const METHOD = 'method';
+    /**
+     * @var string
+     */
+    protected $method;
+
+    public function __construct(
+        ?string $name = null,
+        ?string $url = null,
+        string $method = 'get'
+    ) {
+        parent::__construct($name);
+        $this->url = $url;
+        $this->method = $method;
+    }
 
     public function applyTo(Segment $segment)
     {
@@ -22,11 +38,9 @@ class HttpSegmentConfig extends SegmentConfig
 
     protected function applyToHttp(HttpSegment $segment)
     {
-        if (isset($this->config[HttpSegmentConfig::URL])) {
-            $segment->setUrl($this->config[HttpSegmentConfig::URL]);
+        if (isset($this->url)) {
+            $segment->setUrl($this->url);
         }
-        if (isset($this->config[HttpSegmentConfig::METHOD])) {
-            $segment->setMethod($this->config[HttpSegmentConfig::METHOD]);
-        }
+        $segment->setMethod($this->method);
     }
 }

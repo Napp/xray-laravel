@@ -39,15 +39,14 @@ class SegmentCollectorTest extends TestCase
     public function test_add_http_segment()
     {
         $collector = $this->setupCollector();
-        $segment = $collector->addHttpSegment(new HttpSegmentConfig([
-            HttpSegmentConfig::NAME => 'example',
-            HttpSegmentConfig::METHOD => 'POST',
-            HttpSegmentConfig::URL => 'http://example.com',
-        ]))->setResponseCode(400)->end();
+        $segment = $collector
+            ->addHttpSegment(new HttpSegmentConfig('example', 'http://example.com', 'post'))
+            ->setResponseCode(400)
+            ->end();
 
         $data = $segment->jsonSerialize();
         $this->assertEquals('example', $data['name']);
-        $this->assertEquals('POST', $data['http']['request']['method']);
+        $this->assertEquals('post', $data['http']['request']['method']);
         $this->assertEquals('http://example.com', $data['http']['request']['url']);
         $this->assertEquals(400, $data['http']['response']['status']);
     }
@@ -55,15 +54,11 @@ class SegmentCollectorTest extends TestCase
     public function test_add_segment()
     {
         $collector = $this->setupCollector();
-        $segment = $collector->addSegment(new SegmentConfig([
-            SegmentConfig::NAME        => 'example',
-            SegmentConfig::ANNOTATIONS => [
-                'ann1' => 'ann1_value'
-            ],
-            SegmentConfig::METADATA    => [
-                'meta1' => 'meta1_value'
-            ],
-        ]))->end();
+        $segment = $collector->addSegment(
+            (new SegmentConfig('example'))
+                ->setAnnotations(['ann1' => 'ann1_value'])
+                ->setMetadata(['meta1' => 'meta1_value'])
+        )->end();
 
         $data = $segment->jsonSerialize();
         $this->assertEquals('example', $data['name']);
@@ -77,14 +72,12 @@ class SegmentCollectorTest extends TestCase
         $collector = $this->setupCollector();
         $parent = $collector->getCurrentSegment();
 
-        $segment1 = $collector->addSegment(new SegmentConfig([
-            SegmentConfig::NAME           => 'segment1',
-            SegmentConfig::PARENT_SEGMENT => $parent,
-        ]));
-        $segment2 = $collector->addSegment(new SegmentConfig([
-            SegmentConfig::NAME           => 'segment2',
-            SegmentConfig::PARENT_SEGMENT => $parent,
-        ]));
+        $segment1 = $collector->addSegment(
+            (new SegmentConfig('segment1'))->setParent($parent)
+        );
+        $segment2 = $collector->addSegment(
+            (new SegmentConfig('segment2'))->setParent($parent)
+        );
 
         $segment1->end();
         $segment2->end();

@@ -16,9 +16,7 @@ class RouteCollector extends EventsCollector
     public function registerEventListeners(): void
     {
         $this->app->booted(function () {
-            $this->segment = $this->addSegment(new SegmentConfig([
-                SegmentConfig::NAME => 'route matching',
-            ]));
+            $this->segment = $this->addSegment(new SegmentConfig('route matching'));
         });
 
         // Time between route resolution and request handled
@@ -26,9 +24,8 @@ class RouteCollector extends EventsCollector
             $this->segment->end();
 
             try {
-                $this->segment = $this->addSegment(new SegmentConfig([
-                        SegmentConfig::NAME => 'request handled',
-                    ]))
+                $this->segment = $this
+                    ->addSegment(new SegmentConfig('request handled'))
                     ->addAnnotation('controller', $this->getController())
                     ->end();
             } catch (\Exception $e) {

@@ -13,9 +13,7 @@ class FrameworkCollector extends EventsCollector
 
     public function registerEventListeners(): void
     {
-        $this->segment = $this->addSegment(new SegmentConfig([
-            SegmentConfig::NAME => 'laravel boot',
-        ]));
+        $this->segment = $this->addSegment(new SegmentConfig('laravel boot'));
 
         $this->app->booted(function () {
             $this->segment->end();

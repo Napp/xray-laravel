@@ -24,9 +24,8 @@ class JobCollector extends EventsCollector
 
             $this->segment = $this->addCustomSegment(
                 (new JobSegment())->setPayload($event->job->payload()),
-                new SegmentConfig([
-                    SegmentConfig::NAME => $event->job->resolveName(),
-                ]));
+                new SegmentConfig($event->job->resolveName())
+            );
         });
 
         $this->app['events']->listen(JobProcessed::class, function (JobProcessed $event) {

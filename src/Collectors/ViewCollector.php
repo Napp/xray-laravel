@@ -15,9 +15,9 @@ class ViewCollector extends EventsCollector
     {
         $this->app['events']->listen('creating:*', function ($view, $data = []) {
             $viewName = substr($view, 10);
-            $this->segment = $this->addSegment(new SegmentConfig([
-                SegmentConfig::NAME => 'View ' . $viewName,
-            ]))->end();
+            $this->segment = $this
+                ->addSegment(new SegmentConfig('View ' . $viewName))
+                ->end();
         });
 
         $this->app['events']->listen('composing:*', function ($view, $data = []) {

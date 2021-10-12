@@ -98,7 +98,7 @@ class SegmentCollector
 
         $config->applyTo($segment);
 
-        $parent = $config->getParentSegment() ?? $this->getCurrentSegment();
+        $parent = $config->getParent() ?? $this->getCurrentSegment();
         $parent->addSubsegment($segment);
 
         return $segment->begin();
