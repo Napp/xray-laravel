@@ -11,7 +11,7 @@ use Napp\Xray\Config\SegmentConfig;
 class RouteCollector extends EventsCollector
 {
     /** @var Segment  */
-    protected $segment;
+    private $segment;
 
     public function registerEventListeners(): void
     {

@@ -9,7 +9,7 @@ use Napp\Xray\Config\SegmentConfig;
 class ViewCollector extends EventsCollector
 {
     /** @var Segment  */
-    protected $segment;
+    private $segment;
 
     public function registerEventListeners(): void
     {

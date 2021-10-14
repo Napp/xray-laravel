@@ -15,7 +15,7 @@ use Napp\Xray\Segments\JobSegment;
 class JobCollector extends EventsCollector
 {
     /** @var JobSegment  */
-    protected $segment;
+    private $segment;
 
     public function registerEventListeners(): void
     {
