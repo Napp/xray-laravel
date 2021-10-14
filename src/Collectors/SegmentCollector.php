@@ -31,7 +31,18 @@ class SegmentCollector
 
     public function getCurrentSegment(): Segment
     {
-        return $this->tracer()->getCurrentSegment();
+        return $this->getLastSegment() ?? $this->tracer();
+    }
+
+    /**
+     * @todo Use array_key_last() instead as of PHP 7.3.
+     */ 
+    private function getLastSegment(): ?Segment
+    {
+        end($this->segments);
+        $lastSegment = current($this->segments);
+        reset($this->segments);
+        return $lastSegment === false ? null : $lastSegment;
     }
 
     public function isEnabled(): bool
