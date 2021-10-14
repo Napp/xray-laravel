@@ -52,6 +52,21 @@ class Xray
         return $this->collector->addCustomSegment($segment, $config);
     }
 
+    public function getSegment(string $id): ?Segment
+    {
+        return $this->collector->getSegment($id);
+    }
+
+    public function endSegment(string $id): void
+    {
+        $this->collector->endSegment($id);
+    }
+
+    public function hasAddedSegment(string $id): bool
+    {
+        return $this->collector->hasAddedSegment($id);
+    }
+
     public function endCurrentSegment(): void
     {
         $this->collector->endCurrentSegment();

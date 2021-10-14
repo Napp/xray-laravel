@@ -17,6 +17,13 @@ class SegmentCollector
 {
     use Backtracer;
 
+    /**
+     * Segments indexed by ids.
+     *
+     * @var array<string, Segment>
+     */
+    protected $segments = [];
+
     public function tracer(): Trace
     {
         return Trace::getInstance();
@@ -48,6 +55,7 @@ class SegmentCollector
             return;
         }
 
+        $this->segments = [];
         $tracer = $this->tracer()
             ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
             ->setName(config('xray.name') ?? config('app.name'))
@@ -69,6 +77,7 @@ class SegmentCollector
             return;
         }
 
+        $this->segments = [];
         $tracer = $this->tracer()
             ->setName((config('xray.name') ?? config('app.name')) . ' CLI')
             ->setUrl($name);
@@ -101,7 +110,27 @@ class SegmentCollector
         $parent = $config->getParent() ?? $this->getCurrentSegment();
         $parent->addSubsegment($segment);
 
-        return $segment->begin();
+        $segment->begin();
+        return $this->segments[$segment->getId()] = $segment;
+    }
+
+    public function getSegment(string $id): ?Segment
+    {
+        return $this->hasAddedSegment($id) ? $this->segments[$id] : null;
+    }
+
+    public function endSegment(string $id): void
+    {
+        if ($this->hasAddedSegment($id)) {
+            $this->segments[$id]->end();
+
+            unset($this->segments[$id]);
+        }
+    }
+
+    public function hasAddedSegment(string $id): bool
+    {
+        return array_key_exists($id, $this->segments);
     }
 
     public function endCurrentSegment(): void
