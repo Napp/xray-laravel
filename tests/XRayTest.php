@@ -24,19 +24,18 @@ class XrayTest extends TestCase
         $collector->expects($this->once())->method('getCurrentSegment');
         $collector->expects($this->once())->method('endCurrentSegment');
         $collector->expects($this->once())->method('isEnabled');
-        $collector->expects($this->once())->method('addSegment');
-        $collector->expects($this->once())->method('addCustomSegment')->with($segment, $this->anything());
-        $collector->expects($this->once())->method('addHttpSegment')->with($this->anything());
+        $collector->expects($this->once())->method('addSegment')->with($segment);
+        $collector->expects($this->once())->method('hasAddedSegment')->with($segment->getId());
+        $collector->expects($this->once())->method('getSegment')->with($segment->getId());
+        $collector->expects($this->once())->method('endSegment')->with($segment->getId());
 
         $xray->tracer();
         $xray->getCurrentSegment();
         $xray->endCurrentSegment();
         $xray->isEnabled();
-        $xray->addSegment();
-        $xray->addCustomSegment($segment, (new SegmentConfig('name'))
-            ->setAnnotations(['key1' => 'ann1'])
-            ->setMetadata(['key1' => 'meta1'])
-        );
-        $xray->addHttpSegment(new HttpSegmentConfig('name', 'url', 'method'));
+        $xray->addSegment($segment);
+        $xray->hasAddedSegment($segment->getId());
+        $xray->getSegment($segment->getId());
+        $xray->endSegment($segment->getId());
     }
 }

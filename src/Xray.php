@@ -6,10 +6,7 @@ namespace Napp\Xray;
 
 use Illuminate\Http\Request;
 use Napp\Xray\Collectors\SegmentCollector;
-use Napp\Xray\Config\HttpSegmentConfig;
-use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
-use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
 
 class Xray
@@ -37,19 +34,9 @@ class Xray
         return $this->collector->isEnabled();
     }
 
-    public function addSegment(?SegmentConfig $config = null): Segment
+    public function addSegment(Segment $segment, string $parentId = ''): Segment
     {
-        return $this->collector->addSegment($config);
-    }
-
-    public function addHttpSegment(?HttpSegmentConfig $config = null): HttpSegment
-    {
-        return $this->collector->addHttpSegment($config);
-    }
-
-    public function addCustomSegment(Segment $segment, ?SegmentConfig $config = null): Segment
-    {
-        return $this->collector->addCustomSegment($segment, $config);
+        return $this->collector->addSegment($segment, $parentId);
     }
 
     public function getSegment(string $id): ?Segment

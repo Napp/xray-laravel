@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Napp\Xray\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Napp\Xray\Config\HttpSegmentConfig;
-use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
-use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,9 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @method static Trace tracer()
  * @method static Segment getCurrentSegment()
  * @method static bool isEnabled()
- * @method static Segment addSegment(?SegmentConfig $config = null)
- * @method static HttpSegment addHttpSegment(?HttpSegmentConfig $config = null)
- * @method static Segment addCustomSegment(Segment $segment, ?SegmentConfig $config = null)
+ * @method static Segment addSegment(Segment $segment, string $parentId = '')
  * @method static ?Segment getSegment(string $id)
  * @method static void endSegment(string $id)
  * @method static bool hasAddedSegment(string $id)

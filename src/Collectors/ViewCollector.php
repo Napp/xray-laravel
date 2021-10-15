@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace Napp\Xray\Collectors;
 
-use Napp\Xray\Config\SegmentConfig;
+use Pkerrigan\Xray\Segment;
 
 class ViewCollector extends EventsCollector
 {
-    /** @var Segment  */
-    private $segment;
+    /**
+     * @var string
+     */
+    private $segmentId;
 
     public function registerEventListeners(): void
     {
         $this->app['events']->listen('creating:*', function ($view, $data = []) {
             $viewName = substr($view, 10);
-            $this->segment = $this
-                ->addSegment(new SegmentConfig('View ' . $viewName))
-                ->end();
+            $segment = (new Segment())->setName("View $viewName");
+            $this->segmentId = $this->addSegment($segment)->end()->getId();
         });
 
         $this->app['events']->listen('composing:*', function ($view, $data = []) {
-            $this->segment->end();
+            $this->endSegment($this->segmentId);
         });
     }
 }

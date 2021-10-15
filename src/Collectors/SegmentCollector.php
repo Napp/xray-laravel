@@ -7,10 +7,7 @@ namespace Napp\Xray\Collectors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Napp\Xray\Config\HttpSegmentConfig;
-use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
-use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
 
 class SegmentCollector
@@ -96,29 +93,9 @@ class SegmentCollector
         $tracer->begin($this->getSampleRate());
     }
 
-    public function addSegment(?SegmentConfig $config = null): Segment
+    public function addSegment(Segment $segment, string $parentId = ''): Segment
     {
-        $segment = new Segment();
-
-        return $this->addCustomSegment($segment, $config);
-    }
-
-    public function addHttpSegment(?HttpSegmentConfig $config = null): HttpSegment
-    {
-        $segment = new HttpSegment();
-
-        return $this->addCustomSegment($segment, $config);
-    }
-
-    public function addCustomSegment(Segment $segment, ?SegmentConfig $config = null): Segment
-    {
-        if (is_null($config)) {
-           $config = new SegmentConfig();
-        }
-
-        $config->applyTo($segment);
-
-        $parent = $config->getParent() ?? $this->getCurrentSegment();
+        $parent = $this->getSegment($parentId) ?? $this->getCurrentSegment();
         $parent->addSubsegment($segment);
 
         $segment->begin();
@@ -127,6 +104,10 @@ class SegmentCollector
 
     public function getSegment(string $id): ?Segment
     {
+        if ($id === $this->tracer()->getId()) {
+            return $this->tracer();
+        }
+
         return $this->hasAddedSegment($id) ? $this->segments[$id] : null;
     }
 

@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace Napp\Xray\Collectors;
 
-use Napp\Xray\Config\SegmentConfig;
+use Pkerrigan\Xray\Segment;
 
 class FrameworkCollector extends EventsCollector
 {
-    /** @var Segment  */
-    private $segment;
-
     public function registerEventListeners(): void
     {
-        $this->segment = $this->addSegment(new SegmentConfig('laravel boot'));
+        $segment = (new Segment())->setName('laravel boot');
+        $segmentId = $this->addSegment($segment)->getId();
 
-        $this->app->booted(function () {
-            $this->segment->end();
+        $this->app->booted(function () use ($segmentId) {
+            $this->endSegment($segmentId);
         });
     }
 }
