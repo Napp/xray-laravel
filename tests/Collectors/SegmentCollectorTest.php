@@ -11,6 +11,7 @@ use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use Pkerrigan\Xray\Segment;
 
 class SegmentCollectorTest extends TestCase
 {
@@ -36,31 +37,20 @@ class SegmentCollectorTest extends TestCase
         $this->assertTrue($segment->tracer()->isSampled());
     }
 
-    public function test_add_http_segment()
-    {
-        $collector = $this->setupCollector();
-        $segment = $collector
-            ->addHttpSegment(new HttpSegmentConfig('example', 'http://example.com', 'post'))
-            ->setResponseCode(400)
-            ->end();
-
-        $data = $segment->jsonSerialize();
-        $this->assertEquals('example', $data['name']);
-        $this->assertEquals('post', $data['http']['request']['method']);
-        $this->assertEquals('http://example.com', $data['http']['request']['url']);
-        $this->assertEquals(400, $data['http']['response']['status']);
-    }
-
     public function test_add_segment()
     {
         $collector = $this->setupCollector();
-        $segment = $collector->addSegment(
-            (new SegmentConfig('example'))
-                ->setAnnotations(['ann1' => 'ann1_value'])
-                ->setMetadata(['meta1' => 'meta1_value'])
-        )->end();
+        $segmentId = $collector
+            ->addSegment(
+                (new Segment())
+                    ->setName('example')
+                    ->addAnnotation('ann1', 'ann1_value')
+                    ->addMetadata('meta1', 'meta1_value')
+            )
+            ->end()
+            ->getId();
 
-        $data = $segment->jsonSerialize();
+        $data = $collector->getSegment($segmentId)->jsonSerialize();
         $this->assertEquals('example', $data['name']);
         $this->assertEquals('ann1_value', $data['annotations']['ann1']);
         $this->assertEquals('meta1_value', $data['metadata']['meta1']);
@@ -72,18 +62,11 @@ class SegmentCollectorTest extends TestCase
         $collector = $this->setupCollector();
         $parent = $collector->getCurrentSegment();
 
-        $segment1 = $collector->addSegment(
-            (new SegmentConfig('segment1'))->setParent($parent)
-        );
-        $segment2 = $collector->addSegment(
-            (new SegmentConfig('segment2'))->setParent($parent)
-        );
-
-        $segment1->end();
-        $segment2->end();
+        $collector->addSegment(new Segment(), $parent->getId());
+        $collector->addSegment(new Segment(), $parent->getId());
 
         $subsegments = $parent->jsonSerialize()['subsegments'];
-        $this->assertEquals(count($subsegments), 2);
+        $this->assertEquals(2, count($subsegments));
     }
 
     public function test_bind_hierarchy()
@@ -91,12 +74,8 @@ class SegmentCollectorTest extends TestCase
         $collector = $this->setupCollector();
         $parent = $collector->getCurrentSegment();
 
-        $segment1 = $collector->addSegment();
-        $segment2 = $collector->addSegment();
-
-        $segment1->end();
-        $segment2->end();
-        $collector->endCurrentSegment();
+        $collector->addSegment(new Segment());
+        $collector->addSegment(new Segment());
 
         $level1Segments = $parent->jsonSerialize()['subsegments'];
         $this->assertEquals(count($level1Segments), 1);

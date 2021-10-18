@@ -7,15 +7,19 @@ namespace Napp\Xray\Collectors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Napp\Xray\Config\HttpSegmentConfig;
-use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
-use Pkerrigan\Xray\HttpSegment;
 use Pkerrigan\Xray\Segment;
 
 class SegmentCollector
 {
     use Backtracer;
+
+    /**
+     * Segments indexed by ids.
+     *
+     * @var array<string, Segment>
+     */
+    protected $segments = [];
 
     public function tracer(): Trace
     {
@@ -24,7 +28,18 @@ class SegmentCollector
 
     public function getCurrentSegment(): Segment
     {
-        return $this->tracer()->getCurrentSegment();
+        return $this->getLastSegment() ?? $this->tracer();
+    }
+
+    /**
+     * @todo Use array_key_last() instead as of PHP 7.3.
+     */ 
+    private function getLastSegment(): ?Segment
+    {
+        end($this->segments);
+        $lastSegment = current($this->segments);
+        reset($this->segments);
+        return $lastSegment === false ? null : $lastSegment;
     }
 
     public function isEnabled(): bool
@@ -48,6 +63,7 @@ class SegmentCollector
             return;
         }
 
+        $this->segments = [];
         $tracer = $this->tracer()
             ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
             ->setName(config('xray.name') ?? config('app.name'))
@@ -69,6 +85,7 @@ class SegmentCollector
             return;
         }
 
+        $this->segments = [];
         $tracer = $this->tracer()
             ->setName((config('xray.name') ?? config('app.name')) . ' CLI')
             ->setUrl($name);
@@ -76,32 +93,36 @@ class SegmentCollector
         $tracer->begin($this->getSampleRate());
     }
 
-    public function addSegment(?SegmentConfig $config = null): Segment
+    public function addSegment(Segment $segment, string $parentId = ''): Segment
     {
-        $segment = new Segment();
-
-        return $this->addCustomSegment($segment, $config);
-    }
-
-    public function addHttpSegment(?HttpSegmentConfig $config = null): HttpSegment
-    {
-        $segment = new HttpSegment();
-
-        return $this->addCustomSegment($segment, $config);
-    }
-
-    public function addCustomSegment(Segment $segment, ?SegmentConfig $config = null): Segment
-    {
-        if (is_null($config)) {
-           $config = new SegmentConfig();
-        }
-
-        $config->applyTo($segment);
-
-        $parent = $config->getParent() ?? $this->getCurrentSegment();
+        $parent = $this->getSegment($parentId) ?? $this->getCurrentSegment();
         $parent->addSubsegment($segment);
 
-        return $segment->begin();
+        $segment->begin();
+        return $this->segments[$segment->getId()] = $segment;
+    }
+
+    public function getSegment(string $id): ?Segment
+    {
+        if ($id === $this->tracer()->getId()) {
+            return $this->tracer();
+        }
+
+        return $this->hasAddedSegment($id) ? $this->segments[$id] : null;
+    }
+
+    public function endSegment(string $id): void
+    {
+        if ($this->hasAddedSegment($id)) {
+            $this->segments[$id]->end();
+
+            unset($this->segments[$id]);
+        }
+    }
+
+    public function hasAddedSegment(string $id): bool
+    {
+        return array_key_exists($id, $this->segments);
     }
 
     public function endCurrentSegment(): void
