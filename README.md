@@ -16,11 +16,11 @@ This package enables automatic tracing of important parts of your application, s
 
 Below is a simple example of a http request with a database query. This query is quite slow and could maybe be optimized or cached.
 
-![timeline](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-timeline.png)
+![timeline](docs/xray-timeline.png)
 
 Each element has extra information, such as the database query stack trace.
 
-![db-stack](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-db-stack.png)
+![db-stack](docs/xray-db-stack.png)
 
 ## Installation
 
@@ -28,6 +28,19 @@ Each element has extra information, such as the database query stack trace.
 
 ```bash
 composer require napp/xray-laravel
+```
+
+Update `composer.json` repositories value:
+
+```json
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/104corp/xray-laravel"
+    }
+  ]
+}
 ```
 
 2. Add middleware to the top of the global middleware in `App\Http\Kernel.php`.
@@ -72,71 +85,78 @@ Either add the preexisting policy from AWS `AWSXrayWriteOnlyAccess`, or create y
 
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "xray:PutTraceSegments",
-                "xray:PutTelemetryRecords",
-                "xray:GetSamplingRules",
-                "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries"
-            ],
-            "Resource": ["*"]
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords",
+        "xray:GetSamplingRules",
+        "xray:GetSamplingTargets",
+        "xray:GetSamplingStatisticSummaries"
+      ],
+      "Resource": ["*"]
+    }
+  ]
 }
 ```
 
 5. Head over to AWS Console, to Lambda and find your function. Activate X-Ray Tracing.
 
-![Activate](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/lambda-enable-xray.png)
+![Activate](docs/lambda-enable-xray.png)
 
 ## Manually use the Tracer
 
 Lets say you want to trace a specific piece of your code to deeply understand the impact on performance.
 
 ```php
-Xray::addSegment('MyCustomLogic');
+use Pkerrigan\Xray\Segment;
+
+$segment = (new Segment())->setName('MyCustomLogic');
+Xray::addSegment($segment);
 
 // run your code
 
-Xray::endSegment('MyCustomLogic');
+Xray::endSegment($segment->getId());
 ```
 
 Another use case is to inspect some heavy php side parsing of data.
 
 ```php
 use Napp\Xray\Facades\Xray;
+use Pkerrigan\Xray\Segment;
 
 class XMLParser
 {
     public function handle($file)
     {
         // adding some metadata to the segment
-        Xray::addSegment('XMLParser', null, [
-            'file' => $file->name()
-        ]);
+        $segment = (new Segment())
+          ->setName('XMLParser')
+          ->addMetadata('file', $file->name());
+        Xray::addSegment($segment);
         $this->parse($file);
-        Xray::endSegment('XMLParser');
+        Xray::endSegment($segment->getId());
     }
 
     private function parse($xml): array
     {
-        Xray::addSegment('XMLParser parse');
+        $segment = (new Segment())->setName('XMLParser parse');
+        Xray::addSegment($segment);
         $output = $this->getAttributeList();
         // some more code
-        Xray::endSegment('XMLParser parse');
+        Xray::endSegment($segment->getId());
 
         return $output;
     }
 
     private function getAttributeList(): array
     {
-        Xray::addSegment('XMLParser getAttributeList');
+        $segment = (new Segment())->setName('XMLParser getAttributeList');
+        Xray::addSegment($segment);
         // your code
-        Xray::endSegment('XMLParser getAttributeList');
+        Xray::endSegment($segment->getId());
 
         return [];
     }
@@ -145,7 +165,7 @@ class XMLParser
 
 The above results in:
 
-![XML-example](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-xml-example.png)
+![XML-example](docs/xray-xml-example.png)
 
 ## Daemon support
 
@@ -165,42 +185,41 @@ AWS_XRAY_ENABLED=false
 
 ## What Tracers are supported
 
--   [x] Composer autoload
--   [x] Framework boot
--   [x] Route matching
--   [x] HTTP requests
--   [x] Database queries
--   [x] Queue jobs
--   [x] Blade view render
+- [x] Composer autoload
+- [x] Framework boot
+- [x] Route matching
+- [x] Database queries
+- [x] Queue jobs
+- [x] Blade view render
 
 ## Environment
 
 These environment variables are injected for you if using a service like [Laravel Vapor](https://vapor.laravel.com/)
 
--   `AWS_XRAY_ENABLED`, default: `true`
--   `AWS_XRAY_ENABLE_DB_QUERY`, default: `true`
--   `AWS_XRAY_ENABLE_DB_QUERY_BINDINGS`, default: `false`
--   `AWS_XRAY_ENABLE_JOB`, default: `true`
--   `AWS_XRAY_ENABLE_VIEW`, default: `true`
--   `AWS_XRAY_ENABLE_ROUTE`, default: `true`
--   `AWS_XRAY_ENABLE_FRAMEWORK`, default: `true`
--   `AWS_XRAY_SAMPLE_RATE`, default: `100`
-    -   should between `1` to `100`
-    -   when not finding `HTTP_X_AMZN_TRACE_ID` in header, using this sample rate globally
+- `AWS_XRAY_ENABLED`, default: `true`
+- `AWS_XRAY_ENABLE_DB_QUERY`, default: `true`
+- `AWS_XRAY_ENABLE_DB_QUERY_BINDINGS`, default: `false`
+- `AWS_XRAY_ENABLE_JOB`, default: `true`
+- `AWS_XRAY_ENABLE_VIEW`, default: `true`
+- `AWS_XRAY_ENABLE_ROUTE`, default: `true`
+- `AWS_XRAY_ENABLE_FRAMEWORK`, default: `true`
+- `AWS_XRAY_SAMPLE_RATE`, default: `100`
+  - should between `1` to `100`
+  - when not finding `HTTP_X_AMZN_TRACE_ID` in header, using this sample rate globally
 
 ### Daemon
 
--   `AWS_XRAY_DAEMON_HOST`
--   `AWS_XRAY_DAEMON_PORT`, default: `2000`
+- `AWS_XRAY_DAEMON_HOST`
+- `AWS_XRAY_DAEMON_PORT`, default: `2000`
 
 ### API
 
--   `AWS_XRAY_REGION`, default: `AWS_DEFAULT_REGION`
--   `AWS_XRAY_VERSION`, default: `latest`
--   `AWS_XRAY_SIGNATURE_VERSION`, default: `v4`
--   `AWS_XRAY_ACCESS_KEY_ID`, default: `AWS_ACCESS_KEY_ID`
--   `AWS_XRAY_SECRET_ACCESS_KEY`, default: `AWS_SECRET_ACCESS_KEY`
--   `AWS_XRAY_TOKEN`
+- `AWS_XRAY_REGION`, default: `AWS_DEFAULT_REGION`
+- `AWS_XRAY_VERSION`, default: `latest`
+- `AWS_XRAY_SIGNATURE_VERSION`, default: `v4`
+- `AWS_XRAY_ACCESS_KEY_ID`, default: `AWS_ACCESS_KEY_ID`
+- `AWS_XRAY_SECRET_ACCESS_KEY`, default: `AWS_SECRET_ACCESS_KEY`
+- `AWS_XRAY_TOKEN`
 
 ## LICENSE
 
