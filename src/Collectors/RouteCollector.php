@@ -6,31 +6,39 @@ namespace Napp\Xray\Collectors;
 
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Routing\Events\RouteMatched;
+use Pkerrigan\Xray\Segment;
 
 class RouteCollector extends EventsCollector
 {
+    /**
+     * @var string
+     */
+    private $segmentId;
+
     public function registerEventListeners(): void
     {
         $this->app->booted(function () {
-            $this->addSegment('route matching');
+            $segment = (new Segment())->setName('route matching');
+            $this->segmentId = $this->addSegment($segment)->getId();
         });
 
         // Time between route resolution and request handled
         $this->app['events']->listen(RouteMatched::class, function ($event) {
-            // end the segment first avoid missing end time
-            $this->endSegment('route matching');
+            $this->endSegment($this->segmentId);
+
             try {
-                $this->addSegment('request handled')
-                    ->addAnnotation('controller', $this->getController());
+                $segment = (new Segment())
+                    ->setName('request handled')
+                    ->addAnnotation('controller', $this->getController())
+                    ->end();
+                $this->segmentId = $this->addSegment($segment)->getId();
             } catch (\Exception $e) {
                 $this->handleException($e);
             }
         });
 
         $this->app['events']->listen(RequestHandled::class, function () {
-            // close segment if not founding any route
-            $this->endSegment('route matching');
-            $this->endSegment('request handled');
+            $this->endSegment($this->segmentId);
         });
     }
 

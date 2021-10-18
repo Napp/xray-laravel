@@ -39,7 +39,7 @@ class DatabaseQueryCollector extends EventsCollector
         }
 
         $backtrace = $this->getBacktrace();
-        $this->current()->addSubsegment(
+        $this->getCurrentSegment()->addSubsegment(
             (new SqlSegment())
                 ->setName($connection->getName())
                 ->setDatabaseType($connection->getDriverName())
