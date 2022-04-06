@@ -113,6 +113,7 @@ class SegmentCollector
         if (\is_null($this->segments)) {
             return false;
         }
+        
         return \array_key_exists($name, $this->segments);
     }
 
