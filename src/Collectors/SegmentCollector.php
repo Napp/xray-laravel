@@ -110,6 +110,9 @@ class SegmentCollector
 
     public function hasAddedSegment(string $name): bool
     {
+        if (\is_null($this->segments)) {
+            return false;
+        }
         return \array_key_exists($name, $this->segments);
     }
 
