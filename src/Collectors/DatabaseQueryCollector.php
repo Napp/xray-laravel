@@ -46,7 +46,7 @@ class DatabaseQueryCollector extends EventsCollector
         $sql = str_replace(['%', '?'], ['%%', '%s'], $sql);
 
         $handledBindings = array_map(function ($binding) {
-            if (is_numeric($binding)) {
+            if (is_null($binding) || is_numeric($binding)) {
                 return $binding;
             }
 
