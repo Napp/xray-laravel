@@ -7,14 +7,6 @@ on:
   pull_request:
 
 jobs:
-  php-cs-fixer:
-    name: PHP-CS-Fixer
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: docker://oskarstark/php-cs-fixer-ga
-
   build-test:
     runs-on: ubuntu-latest
     strategy:
