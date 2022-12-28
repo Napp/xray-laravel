@@ -10,10 +10,7 @@ use Pkerrigan\Xray\Submission\SegmentSubmitter;
 
 class APISegmentSubmitter implements SegmentSubmitter
 {
-    /**
-     * @var \Aws\XRay\XRayClient
-     */
-    private $client;
+    private XRayClient $client;
 
     public function __construct()
     {

@@ -11,8 +11,7 @@ use Pkerrigan\Xray\Segment;
 
 class Xray
 {
-    /** @var SegmentCollector */
-    private $collector;
+    private SegmentCollector $collector;
 
     public function __construct(SegmentCollector $collector)
     {
@@ -64,7 +63,7 @@ class Xray
         $this->collector->initHttpTracer($request);
     }
 
-    public function initCliTracer(String $name): void
+    public function initCliTracer(string $name): void
     {
         $this->collector->initCliTracer($name);
     }

@@ -6,16 +6,13 @@ namespace Napp\Xray\Tests;
 
 use Illuminate\Http\Request;
 use Napp\Xray\Collectors\SegmentCollector;
-use Napp\Xray\Config\HttpSegmentConfig;
-use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Segments\Trace;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Pkerrigan\Xray\Segment;
 
 class SegmentCollectorTest extends TestCase
 {
-    public function test_disable_trace_if_filtered()
+    public function testDisableTraceIfFiltered()
     {
         $request = $this->createRequest();
         $request->expects($this->any())->method('path')->willReturn('filter/path');
@@ -26,7 +23,7 @@ class SegmentCollectorTest extends TestCase
         $this->assertFalse($segment->tracer()->isSampled());
     }
 
-    public function test_should_enable_trace()
+    public function testShouldEnableTrace()
     {
         $request = $this->createRequest();
         $request->expects($this->any())->method('path')->willReturn('normal/path');
@@ -37,7 +34,7 @@ class SegmentCollectorTest extends TestCase
         $this->assertTrue($segment->tracer()->isSampled());
     }
 
-    public function test_add_segment()
+    public function testAddSegment()
     {
         $collector = $this->setupCollector();
         $segmentId = $collector
@@ -57,7 +54,7 @@ class SegmentCollectorTest extends TestCase
         $this->assertNotNull($data['end_time']);
     }
 
-    public function test_bind_same_parent_segment()
+    public function testBindSameParentSegment()
     {
         $collector = $this->setupCollector();
         $parent = $collector->getCurrentSegment();
@@ -69,7 +66,7 @@ class SegmentCollectorTest extends TestCase
         $this->assertEquals(2, count($subsegments));
     }
 
-    public function test_bind_hierarchy()
+    public function testBindHierarchy()
     {
         $collector = $this->setupCollector();
         $parent = $collector->getCurrentSegment();
@@ -83,7 +80,7 @@ class SegmentCollectorTest extends TestCase
         $this->assertEquals(count($level2Segments), 1);
     }
 
-    public function test_handle_exception()
+    public function testHandleException()
     {
         // should not rethrow exception
         $this->app['config']->set('xray.ignore_error', true);
@@ -134,7 +131,8 @@ class SegmentCollectorTest extends TestCase
         return $request;
     }
 
-    private function setupCollector(): SegmentCollector {
+    private function setupCollector(): SegmentCollector
+    {
         $collector = new SegmentCollector();
         $collector->getCurrentSegment()->begin();
 

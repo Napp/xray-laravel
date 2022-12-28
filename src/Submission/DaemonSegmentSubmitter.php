@@ -10,10 +10,7 @@ use Pkerrigan\Xray\Submission\SegmentSubmitter;
 
 class DaemonSegmentSubmitter implements SegmentSubmitter
 {
-    /**
-     * @var DaemonSegmentSubmitterWithLog
-     */
-    private $submitter;
+    private SubmissionDaemonSegmentSubmitter $submitter;
 
     /**
      * @var string

@@ -9,10 +9,7 @@ use Napp\Xray\Xray;
 
 class RequestTracing
 {
-    /**
-     * @var \Napp\Xray\Xray
-     */
-    private $xray;
+    private Xray $xray;
 
     public function __construct(Xray $xray)
     {

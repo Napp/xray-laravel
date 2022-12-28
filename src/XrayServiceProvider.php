@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Napp\Xray;
 
-use Napp\Xray\Collectors\JobCollector;
 use Illuminate\Support\ServiceProvider;
-use Napp\Xray\Collectors\ViewCollector;
-use Napp\Xray\Collectors\RouteCollector;
-use Napp\Xray\Collectors\FrameworkCollector;
 use Napp\Xray\Collectors\DatabaseQueryCollector;
+use Napp\Xray\Collectors\FrameworkCollector;
+use Napp\Xray\Collectors\JobCollector;
+use Napp\Xray\Collectors\RouteCollector;
+use Napp\Xray\Collectors\ViewCollector;
 
 class XrayServiceProvider extends ServiceProvider
 {
@@ -18,7 +18,7 @@ class XrayServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/xray.php', 'xray');
         $this->registerFacade();
@@ -29,7 +29,7 @@ class XrayServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__ . '/../config/xray.php' => config_path('xray.php')], 'xray-config');

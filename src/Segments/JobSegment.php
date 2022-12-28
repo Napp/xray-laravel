@@ -8,15 +8,9 @@ use Pkerrigan\Xray\Segment;
 
 class JobSegment extends Segment
 {
-    /**
-     * @var array
-     */
-    protected $payload;
+    protected array $payload = [];
 
-    /**
-     * @var bool
-     */
-    private $result;
+    private bool $result = false;
 
     public function setPayload(array $payload)
     {

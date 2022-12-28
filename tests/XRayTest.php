@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace Napp\Xray\Tests;
 
 use Napp\Xray\Collectors\SegmentCollector;
-use Napp\Xray\Config\HttpSegmentConfig;
-use Napp\Xray\Config\SegmentConfig;
 use Napp\Xray\Xray;
 use PHPUnit\Framework\TestCase;
 use Pkerrigan\Xray\Segment;
 
 class XrayTest extends TestCase
 {
-    public function test_should_pass_all_functions()
+    public function testShouldPassAllFunctions()
     {
         $collector = $this->createMock(SegmentCollector::class);
         $segment = new Segment();

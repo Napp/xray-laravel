@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<ruleset name="AuthSidecarPhpHelper">
+    <description>VIP 2.5 Auth Sidecar PHP Helper rules for PHP CodeSniffer</description>
+
+    <!-- display progress and sniff -->
+    <arg value="p"/>
+    <arg value="s"/>
+
+    <rule ref="PSR2" />
+
+    <rule ref="PSR12" />
+
+    <rule ref="PEAR.ControlStructures.MultiLineCondition">
+        <properties>
+            <property name="indent" value="4"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="200"/>
+            <property name="absoluteLineLimit" value="0"/>
+        </properties>
+    </rule>
+
+    <file>src</file>
+    <file>tests</file>
+</ruleset>

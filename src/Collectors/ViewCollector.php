@@ -8,10 +8,7 @@ use Pkerrigan\Xray\Segment;
 
 class ViewCollector extends EventsCollector
 {
-    /**
-     * @var string
-     */
-    private $segmentId;
+    private string $segmentId;
 
     public function registerEventListeners(): void
     {

@@ -12,8 +12,8 @@ use Napp\Xray\Segments\SqlSegment;
 
 class DatabaseQueryCollector extends EventsCollector
 {
-    protected $bindingsEnabled = false;
-    protected $eraseQuery = false;
+    protected bool $bindingsEnabled = false;
+    protected bool $eraseQuery = false;
 
     public function registerEventListeners(): void
     {
@@ -34,7 +34,7 @@ class DatabaseQueryCollector extends EventsCollector
     {
         if ($this->eraseQuery) {
             $sql = '';
-        } else if ($this->bindingsEnabled) {
+        } elseif ($this->bindingsEnabled) {
             $sql = $this->parseBindings($sql, $bindings, $connection);
         }
 

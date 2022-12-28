@@ -10,10 +10,7 @@ use Pkerrigan\Xray\Segment;
 
 class RouteCollector extends EventsCollector
 {
-    /**
-     * @var string
-     */
-    private $segmentId;
+    private string $segmentId;
 
     public function registerEventListeners(): void
     {

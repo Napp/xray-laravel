@@ -11,7 +11,7 @@ use Orchestra\Testbench\TestCase;
 
 class DatabaseQueryCollectorTest extends TestCase
 {
-    public function test_return_query_if_count_not_match()
+    public function testReturnQueryIfCountNotMatch()
     {
         $this->app['config']->set('xray.db_erase_query', false);
         $this->app['config']->set('xray.db_bindings', true);
@@ -36,7 +36,7 @@ class DatabaseQueryCollectorTest extends TestCase
         $this->assertEquals('abc ? def ? ?', $querySerialized['sql']['sanitized_query']);
     }
 
-    public function test_binding_correctly()
+    public function testBindingCorrectly()
     {
         $this->app['config']->set('xray.db_erase_query', false);
         $this->app['config']->set('xray.db_bindings', true);
@@ -61,7 +61,7 @@ class DatabaseQueryCollectorTest extends TestCase
         $this->assertEquals("abc 123 def 'ghi'", $querySerialized['sql']['sanitized_query']);
     }
 
-    public function test_should_ignore_binding_when_erase_query()
+    public function testShouldIgnoreBindingWhenEraseQuery()
     {
         $this->app['config']->set('xray.db_erase_query', true);
         $this->app['config']->set('xray.db_bindings', true);
@@ -91,7 +91,8 @@ class DatabaseQueryCollectorTest extends TestCase
         Trace::flush();
     }
 
-    private function setupCollector(): DatabaseQueryCollector {
+    private function setupCollector(): DatabaseQueryCollector
+    {
         $collector = new DatabaseQueryCollector($this->app);
         $collector->getCurrentSegment()->begin();
 

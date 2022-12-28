@@ -8,16 +8,19 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false">
-    <testsuites>
-        <testsuite name="Xray">
-            <directory suffix="Test.php">./tests</directory>
-        </testsuite>
-    </testsuites>
+    <testsuite name="Unit">
+        <directory suffix="Test.php">tests</directory>
+    </testsuite>
+
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-html" target="build/coverage" />
+        <log type="junit" target="build/phpunit/phpunit.xml" />
+    </logging>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_NAME" value="Xray Package Testing"/>

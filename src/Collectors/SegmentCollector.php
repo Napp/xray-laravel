@@ -19,7 +19,7 @@ class SegmentCollector
      *
      * @var array<string, Segment>
      */
-    protected $segments = [];
+    protected array $segments = [];
 
     public function tracer(): Trace
     {
@@ -33,7 +33,7 @@ class SegmentCollector
 
     /**
      * @todo Use array_key_last() instead as of PHP 7.3.
-     */ 
+     */
     private function getLastSegment(): ?Segment
     {
         end($this->segments);
