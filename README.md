@@ -5,6 +5,13 @@
 
 The package automatically trace your laravel application and sends to [AWS X-Ray](https://aws.amazon.com/xray).
 
+Support version matrix:
+
+-   PHP 8.0, Laravel 6,7,8,9
+-   PHP 8.1, Laravel 8,9 (Laravel 6,7 will break the functions)
+-   PHP 8.2, Laravel 8,9
+-   else are untested!
+
 ## What is X-Ray?
 
 X-Ray is a distributed tracing system for production apps. AWS X-Ray traces user requests as they travel through your entire application.
@@ -185,41 +192,41 @@ AWS_XRAY_ENABLED=false
 
 ## What Tracers are supported
 
-- [x] Composer autoload
-- [x] Framework boot
-- [x] Route matching
-- [x] Database queries
-- [x] Queue jobs
-- [x] Blade view render
+-   [x] Composer autoload
+-   [x] Framework boot
+-   [x] Route matching
+-   [x] Database queries
+-   [x] Queue jobs
+-   [x] Blade view render
 
 ## Environment
 
 These environment variables are injected for you if using a service like [Laravel Vapor](https://vapor.laravel.com/)
 
-- `AWS_XRAY_ENABLED`, default: `true`
-- `AWS_XRAY_ENABLE_DB_QUERY`, default: `true`
-- `AWS_XRAY_ENABLE_DB_QUERY_BINDINGS`, default: `false`
-- `AWS_XRAY_ENABLE_JOB`, default: `true`
-- `AWS_XRAY_ENABLE_VIEW`, default: `true`
-- `AWS_XRAY_ENABLE_ROUTE`, default: `true`
-- `AWS_XRAY_ENABLE_FRAMEWORK`, default: `true`
-- `AWS_XRAY_SAMPLE_RATE`, default: `100`
-  - should between `1` to `100`
-  - when not finding `HTTP_X_AMZN_TRACE_ID` in header, using this sample rate globally
+-   `AWS_XRAY_ENABLED`, default: `true`
+-   `AWS_XRAY_ENABLE_DB_QUERY`, default: `true`
+-   `AWS_XRAY_ENABLE_DB_QUERY_BINDINGS`, default: `false`
+-   `AWS_XRAY_ENABLE_JOB`, default: `true`
+-   `AWS_XRAY_ENABLE_VIEW`, default: `true`
+-   `AWS_XRAY_ENABLE_ROUTE`, default: `true`
+-   `AWS_XRAY_ENABLE_FRAMEWORK`, default: `true`
+-   `AWS_XRAY_SAMPLE_RATE`, default: `100`
+    -   should between `1` to `100`
+    -   when not finding `HTTP_X_AMZN_TRACE_ID` in header, using this sample rate globally
 
 ### Daemon
 
-- `AWS_XRAY_DAEMON_HOST`
-- `AWS_XRAY_DAEMON_PORT`, default: `2000`
+-   `AWS_XRAY_DAEMON_HOST`
+-   `AWS_XRAY_DAEMON_PORT`, default: `2000`
 
 ### API
 
-- `AWS_XRAY_REGION`, default: `AWS_DEFAULT_REGION`
-- `AWS_XRAY_VERSION`, default: `latest`
-- `AWS_XRAY_SIGNATURE_VERSION`, default: `v4`
-- `AWS_XRAY_ACCESS_KEY_ID`, default: `AWS_ACCESS_KEY_ID`
-- `AWS_XRAY_SECRET_ACCESS_KEY`, default: `AWS_SECRET_ACCESS_KEY`
-- `AWS_XRAY_TOKEN`
+-   `AWS_XRAY_REGION`, default: `AWS_DEFAULT_REGION`
+-   `AWS_XRAY_VERSION`, default: `latest`
+-   `AWS_XRAY_SIGNATURE_VERSION`, default: `v4`
+-   `AWS_XRAY_ACCESS_KEY_ID`, default: `AWS_ACCESS_KEY_ID`
+-   `AWS_XRAY_SECRET_ACCESS_KEY`, default: `AWS_SECRET_ACCESS_KEY`
+-   `AWS_XRAY_TOKEN`
 
 ## LICENSE
 
