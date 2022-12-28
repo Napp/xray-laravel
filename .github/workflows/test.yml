@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - "**.md"
+      - "**.yml"
+      - "docs/**"
+      - "config/**"
   pull_request:
 
 jobs:
