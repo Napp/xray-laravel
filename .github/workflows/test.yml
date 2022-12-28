@@ -72,10 +72,10 @@ jobs:
           echo '${{ steps.composer.outputs.result }}' > composer.json
           cat composer.json
 
-      - uses: shivammathur/setup-php@v2
+      - uses: php-actions/composer@v6
         with:
           php_version: ${{ steps.php.outputs.result }}
-          extensions: sockets
+          php_extensions: sockets
 
       - uses: php-actions/phpunit@v3
         with:
