@@ -30,7 +30,7 @@ trait Backtracer
     protected function parseTrace($index, array $trace)
     {
         if (isset($trace['class']) && ! $this->isExcludedClass($trace['class'])) {
-            return $trace['class'] . ':' . ($trace['line'] ?? '?');
+            return $trace['class'] . ':' . ($trace['line'] ?? '');
         }
 
         return '';
