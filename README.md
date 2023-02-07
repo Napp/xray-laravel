@@ -185,6 +185,7 @@ XRAY_ENABLED=false
 - [x] Database queries
 - [x] Queue jobs
 - [x] Blade view render
+- [x] Cache requests
 
 
 ## LICENSE
