@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Napp\Xray\Collectors;
 
-use Illuminate\Cache\Events\{CacheHit, CacheMissed, KeyForgotten, KeyWritten};
+use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Cache\Events\KeyForgotten;
+use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Redis\Events\CommandExecuted;
 
 class CacheCollector extends EventsCollector
@@ -35,7 +38,6 @@ class CacheCollector extends EventsCollector
             ->addSegment($eventName . ' at ' . $this->getCallerClass($backtrace))
             ->addAnnotation('Key', $cacheKey)
             ->addMetadata('backtrace', $backtrace)
-            ->end()
-        ;
+            ->end();
     }
 }
