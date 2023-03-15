@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Napp\Xray\Collectors;
 
-use Illuminate\Support\Facades\Auth;
+use Napp\Xray\Resolvers\AuthIdentifier;
 use Napp\Xray\Segments\TimeSegment;
 use Napp\Xray\Segments\Trace;
 use Pkerrigan\Xray\Segment;
@@ -126,9 +126,10 @@ class SegmentCollector
     {
         $submitterClass = config('xray.submitter');
         $tracer = $this->tracer();
+        $user = $this->getUser();
 
-        if (app()->bound('auth') && Auth::check()) {
-            $tracer->setUser((string) Auth::user()->getAuthIdentifier());
+        if ($user) {
+            $tracer->setUser($user);
         }
         $tracer->end()
             ->setResponseCode($response->getStatusCode())
@@ -139,12 +140,24 @@ class SegmentCollector
     {
         $submitterClass = config('xray.submitter');
         $tracer = $this->tracer();
+        $user = $this->getUser();
 
-        if (app()->bound(Auth::class) && Auth::check()) {
-            $tracer->setUser((string) Auth::user()->getAuthIdentifier());
+        if ($user) {
+            $tracer->setUser($user);
         }
         $tracer->end()->submit(new $submitterClass());
 
         $tracer::flush();
+    }
+
+    public function getUser(): ?string
+    {
+        $resolver = config('xray.user-resolver', AuthIdentifier::class);
+
+        if ($resolver) {
+            return app($resolver)->getUser();
+        }
+
+        return null;
     }
 }

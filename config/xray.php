@@ -18,6 +18,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | User resolver method
+    |--------------------------------------------------------------------------
+    |
+    | Here you can set a class to find the logged-in user identifier.
+    | Supported classes: "AuthIdentifier"
+    |
+    */
+    'user-resolver' => \Napp\Xray\Resolvers\AuthIdentifier::class,
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Database Query
     |--------------------------------------------------------------------------
     */
