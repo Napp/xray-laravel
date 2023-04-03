@@ -95,7 +95,7 @@ return [
         'credentials' => [
             'key' => env('XRAY_AWS_ACCESS_KEY_ID') ?? env('AWS_ACCESS_KEY_ID'),
             'secret' => env('XRAY_AWS_SECRET_ACCESS_KEY') ?? env('AWS_SECRET_ACCESS_KEY'),
-            'token' => env('XRAY_AWS_TOKEN'),
+            'token' => env('XRAY_AWS_TOKEN') ?? env('AWS_SESSION_TOKEN'),
             'expires' => '',
         ],
     ],
