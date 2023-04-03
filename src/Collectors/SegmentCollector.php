@@ -38,9 +38,15 @@ class SegmentCollector
             return;
         }
 
+        $traceId = json_decode($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null);
+        
+        if ((bool) config('xray.enabled')) {
+            $traceId = json_decode($_SERVER['LAMBDA_INVOCATION_CONTEXT'])->traceId ?? NULL;
+        }
+
         $this->segments = [];
         $tracer = $this->tracer()
-            ->setTraceHeader($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null)
+            ->setTraceHeader($traceId)
             ->setName(config('app.name') . ' HTTP')
             ->setClientIpAddress($request->getClientIp())
             ->addAnnotation('Framework', 'Laravel ' . app()->version())
