@@ -38,7 +38,7 @@ class SegmentCollector
             return;
         }
 
-        $traceId = json_decode($_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null);
+        $traceId = $_SERVER['HTTP_X_AMZN_TRACE_ID'] ?? null;
         
         if ((bool) config('xray.enabled')) {
             $traceId = json_decode($_SERVER['LAMBDA_INVOCATION_CONTEXT'])->traceId ?? NULL;
