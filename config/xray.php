@@ -81,7 +81,7 @@ return [
     | Use LAMBDA_INVOCATION_CONTEXT
     |--------------------------------------------------------------------------
     */
-    'use_lambda_invocation_context' => env('XRAY_USE_LAMBDA_INVOCATION_CONTEXT', true),
+    'use_lambda_invocation_context' => env('XRAY_USE_LAMBDA_INVOCATION_CONTEXT', false),
 
     /*
     |--------------------------------------------------------------------------
