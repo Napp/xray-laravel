@@ -14,7 +14,7 @@ return [
     | Supported classes: "APISegmentSubmitter", "DaemonSegmentSubmitter"
     |
     */
-    'submitter' => \Napp\Xray\Submission\DaemonSegmentSubmitter::class,
+    'submitter' => \Napp\Xray\Submission\APISegmentSubmitter::class,
 
     /*
     |--------------------------------------------------------------------------
