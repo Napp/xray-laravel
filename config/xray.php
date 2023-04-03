@@ -14,7 +14,7 @@ return [
     | Supported classes: "APISegmentSubmitter", "DaemonSegmentSubmitter"
     |
     */
-    'submitter' => \Napp\Xray\Submission\APISegmentSubmitter::class,
+    'submitter' => \Napp\Xray\Submission\DaemonSegmentSubmitter::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -75,6 +75,13 @@ return [
     |--------------------------------------------------------------------------
     */
     'cache' => env('XRAY_CACHE', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Use LAMBDA_INVOCATION_CONTEXT
+    |--------------------------------------------------------------------------
+    */
+    'use_lambda_invocation_context' => env('XRAY_USE_LAMBDA_INVOCATION_CONTEXT', true),
 
     /*
     |--------------------------------------------------------------------------
