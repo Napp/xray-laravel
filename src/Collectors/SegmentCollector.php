@@ -135,7 +135,7 @@ class SegmentCollector
         $submitterClass = config('xray.submitter');
         $tracer = $this->tracer();
 
-        if (app()->bound(Auth::class) && Auth::check()) {
+        if (app()->bound('auth') && Auth::check()) {
             $tracer->setUser((string) Auth::user()->getAuthIdentifier());
         }
 
