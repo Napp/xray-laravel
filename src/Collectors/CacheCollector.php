@@ -35,7 +35,7 @@ class CacheCollector extends EventsCollector
     {
         $backtrace = $this->getBacktrace();
 
-        $eventSuffix = sizeof($backtrace) > 0 ? ('at ' . $this->getCallerClass($backtrace)) : "(too deeply nested)";
+        $eventSuffix = sizeof($backtrace) > 0 ? ('at ' . $this->getCallerClass($backtrace)) : '(too deeply nested)';
 
         $this
             ->addSegment("$eventName $eventSuffix")

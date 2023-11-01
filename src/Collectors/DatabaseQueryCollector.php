@@ -35,7 +35,7 @@ class DatabaseQueryCollector extends EventsCollector
 
         $this->current()->addSubsegment(
             (new SqlSegment())
-                ->setName($connection->getName() . " " . $eventSuffix)
+                ->setName($connection->getName() . ' ' . $eventSuffix)
                 ->setDatabaseType($connection->getDriverName())
                 ->setQuery($sql)
                 ->addMetadata('backtrace', $backtrace)
@@ -44,7 +44,8 @@ class DatabaseQueryCollector extends EventsCollector
         );
     }
 
-    protected function checkForEnabledBindings(): void {
+    protected function checkForEnabledBindings(): void
+    {
         $this->bindingsEnabled = config('xray.db_bindings');
     }
 

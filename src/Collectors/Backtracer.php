@@ -22,7 +22,7 @@ trait Backtracer
 
     public function getCallerClass(array $backtrace): ?string
     {
-        if(sizeof($backtrace) === 0) {
+        if (sizeof($backtrace) === 0) {
             return null;
         }
 
