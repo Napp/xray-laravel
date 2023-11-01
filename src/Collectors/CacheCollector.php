@@ -34,8 +34,11 @@ class CacheCollector extends EventsCollector
     protected function handleQueryReport(string $cacheKey, string $eventName): void
     {
         $backtrace = $this->getBacktrace();
+
+        $eventSuffix = sizeof($backtrace) > 0 ? ('at ' . $this->getCallerClass($backtrace)) : '(too deeply nested)';
+
         $this
-            ->addSegment($eventName . ' at ' . $this->getCallerClass($backtrace))
+            ->addSegment("$eventName $eventSuffix")
             ->addAnnotation('Key', $cacheKey)
             ->addMetadata('backtrace', $backtrace)
             ->end();

@@ -20,8 +20,12 @@ trait Backtracer
         return array_slice(array_filter($sources), 0, 10);
     }
 
-    public function getCallerClass(array $backtrace): string
+    public function getCallerClass(array $backtrace): ?string
     {
+        if (sizeof($backtrace) === 0) {
+            return null;
+        }
+
         $arr = explode('\\', $backtrace[0]);
 
         return end($arr);
