@@ -42,6 +42,12 @@ class XrayServiceProvider extends ServiceProvider
             return;
         }
 
+        $xraySingleton = $this->app->make('xray');
+
+        if(!$this->app->runningInConsole() && !$xraySingleton->shouldCaptureRequest($this->app->make('request'))) {
+            return;
+        }
+
         $this->registerCollectors();
     }
 
@@ -50,13 +56,6 @@ class XrayServiceProvider extends ServiceProvider
      */
     protected function registerCollectors(): void
     {
-        /** @var Xray $xraySingleton */
-        $xraySingleton = $this->app->make('xray');
-
-        if(!$this->app->runningInConsole() && !$xraySingleton->shouldCaptureRequest($this->app->make('request'))) {
-            return;
-        }
-
         if (config('xray.db_query') || $this->app->runningInConsole()) {
             app(DatabaseQueryCollector::class);
         }

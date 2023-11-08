@@ -26,8 +26,9 @@ class XRayServiceProviderTest extends MockeryTestCase
             return $mock;
         });
 
-        // and a mock config that return false for everything
+        // and a mock config that return false for everything but the xray.enable config
         $configMock = \Mockery::mock(Repository::class, function(MockInterface $mock) {
+            $mock->shouldReceive('get')->with('xray.enabled', \Mockery::andAnyOtherArgs())->andReturn(true);
             $mock->shouldReceive('get')->andReturn(false);
 
             return $mock;
@@ -44,16 +45,11 @@ class XRayServiceProviderTest extends MockeryTestCase
             return $configMock;
         });
 
+        // and a XrayServiceProvider
+        $provider = new XrayServiceProvider($applicationMock);
 
-        // and an implementation of XrayServiceProvider that expose the `registerCollectors` function
-        $provider = new class($applicationMock) extends XrayServiceProvider {
-            public function callRegisterCollectors() {
-                $this->registerCollectors();
-            }
-        };
-
-        // when registering the collectors
-        $provider->callRegisterCollectors();
+        // when booting the provider
+        $provider->boot();
 
         // then it should have check if the request should be capture, on the xray singleton object
         $xraySingletonMock->shouldHaveReceived('shouldCaptureRequest');
@@ -85,15 +81,11 @@ class XRayServiceProviderTest extends MockeryTestCase
         });
 
 
-        // and an implementation of XrayServiceProvider that expose the `registerCollectors` function
-        $provider = new class($applicationMock) extends XrayServiceProvider {
-            public function callRegisterCollectors() {
-                $this->registerCollectors();
-            }
-        };
+        // and a XrayServiceProvider
+        $provider = new XrayServiceProvider($applicationMock);
 
-        // when registering the collectors
-        $provider->callRegisterCollectors();
+        // when booting the provider
+        $provider->boot();
 
         // then it should not have registered the collectors
         $applicationMock->shouldNotHaveReceived('make', [DatabaseQueryCollector::class, \Mockery::andAnyOtherArgs()]);
@@ -135,15 +127,11 @@ class XRayServiceProviderTest extends MockeryTestCase
         $applicationMock->shouldReceive('make')->with(FrameworkCollector::class, \Mockery::andAnyOtherArgs())->andReturn();
 
 
-        // and an implementation of XrayServiceProvider that expose the `registerCollectors` function
-        $provider = new class($applicationMock) extends XrayServiceProvider {
-            public function callRegisterCollectors() {
-                $this->registerCollectors();
-            }
-        };
+        // and a XrayServiceProvider
+        $provider = new XrayServiceProvider($applicationMock);
 
-        // when registering the collectors
-        $provider->callRegisterCollectors();
+        // when booting the provider
+        $provider->boot();
 
         // then it should not have registered the collectors
         $applicationMock->shouldHaveReceived('make', [DatabaseQueryCollector::class, \Mockery::andAnyOtherArgs()]);
@@ -185,15 +173,11 @@ class XRayServiceProviderTest extends MockeryTestCase
         $applicationMock->shouldReceive('make')->with(FrameworkCollector::class, \Mockery::andAnyOtherArgs())->andReturn();
 
 
-        // and an implementation of XrayServiceProvider that expose the `registerCollectors` function
-        $provider = new class($applicationMock) extends XrayServiceProvider {
-            public function callRegisterCollectors() {
-                $this->registerCollectors();
-            }
-        };
+        // and a XrayServiceProvider
+        $provider = new XrayServiceProvider($applicationMock);
 
-        // when registering the collectors
-        $provider->callRegisterCollectors();
+        // when booting the provider
+        $provider->boot();
 
         // then it should not have registered the collectors
         $applicationMock->shouldHaveReceived('make', [DatabaseQueryCollector::class, \Mockery::andAnyOtherArgs()]);
