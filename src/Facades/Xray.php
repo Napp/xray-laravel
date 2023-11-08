@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @method static void initCliTracer(string $name)
  * @method static void submitHttpTracer($response)
  * @method static void submitCliTracer()
+ * @method static void addRequestFilterCallback(callable $callback)
  *
  * @see \Napp\Xray\Xray
  */

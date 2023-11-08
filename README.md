@@ -149,6 +149,35 @@ The above results in:
 
 ![XML-example](https://raw.githubusercontent.com/Napp/xray-laravel/master/docs/xray-xml-example.png)
 
+## Request filtering
+There might be some requests you wish not to track in Amazon X-Ray. In order to filter out those requests, you can call the `addRequestFilterCallback` function, on the `Xray` facade.
+This function takes a callback as a parameter. The callback takes a `Symfony\Component\HttpFoundation\Request` as a parameter and is expected to return a boolean.
+
+Please note that this function call needs to be done in the `register` function of your `AppServiceProvider`. You should, also, keep the checks relatively simple, since most of the application service providers won't be booted when calling the filtering callbacks.
+
+When LaravelXray is booting, the request is checked against each registered callbacks. If none returns false, the request is captured. Otherwise, it is not.
+
+```php
+use Symfony\Component\HttpFoundation\Request;
+use Napp\Xray\Facades\Xray;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        Xray::addRequestFilterCallback(function(Request $request) {
+            /* some conditions */
+            return true;
+        });
+    }
+}
+```
+
 ## Daemon support
 
 The X-Ray daemon is automatically run in a Lambda environment. Use this over the default `Napp\Xray\Submission\APISegmentSubmitter` to relay requests to Amazon X-Ray.
