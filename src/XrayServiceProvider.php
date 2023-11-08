@@ -54,7 +54,7 @@ class XrayServiceProvider extends ServiceProvider
         $xraySingleton = $this->app->make('xray');
 
         if(!$this->app->runningInConsole() && !$xraySingleton->shouldCaptureRequest($this->app->make('request'))) {
-
+            return;
         }
 
         if (config('xray.db_query') || $this->app->runningInConsole()) {
