@@ -93,8 +93,8 @@ class Xray
 
     public function shouldCaptureRequest(Request $request): bool
     {
-        foreach($this->requestFilterCallables as $requestFilterCallable) {
-            if(!$requestFilterCallable($request)) {
+        foreach ($this->requestFilterCallables as $requestFilterCallable) {
+            if (! $requestFilterCallable($request)) {
                 return false;
             }
         }
