@@ -13,9 +13,12 @@ class Xray
 {
     private $collector;
 
+    private $requestFilterCallables;
+
     public function __construct(SegmentCollector $collector)
     {
         $this->collector = $collector;
+        $this->requestFilterCallables = [];
     }
 
     public function tracer(): Trace
@@ -81,5 +84,21 @@ class Xray
     public function submitCliTracer(): void
     {
         $this->collector->submitCliTracer();
+    }
+
+    public function addRequestFilterCallback(callable $callback): void
+    {
+        $this->requestFilterCallables[] = $callback;
+    }
+
+    public function shouldCaptureRequest(Request $request): bool
+    {
+        foreach ($this->requestFilterCallables as $requestFilterCallable) {
+            if (! $requestFilterCallable($request)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

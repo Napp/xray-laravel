@@ -42,6 +42,12 @@ class XrayServiceProvider extends ServiceProvider
             return;
         }
 
+        $xraySingleton = $this->app->make('xray');
+
+        if (! $this->app->runningInConsole() && ! $xraySingleton->shouldCaptureRequest($this->app->make('request'))) {
+            return;
+        }
+
         $this->registerCollectors();
     }
 
