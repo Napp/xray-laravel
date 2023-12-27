@@ -47,7 +47,7 @@ class SegmentCollector
         $this->segments = [];
         $tracer = $this->tracer()
             ->setTraceHeader($traceId)
-            ->setName(config('app.name') . ' HTTP')
+            ->setName((config('xray.name') ?? config('app.name')) . ' HTTP')
             ->setClientIpAddress($request->getClientIp())
             ->addAnnotation('Framework', 'Laravel ' . app()->version())
             ->addAnnotation('PHP', PHP_VERSION)
@@ -65,7 +65,7 @@ class SegmentCollector
 
         $this->segments = [];
         $tracer = $this->tracer()
-            ->setName(config('app.name') . ' CLI')
+            ->setName((config('xray.name') ?? config('app.name')) . ' CLI')
             ->addAnnotation('framework', 'Laravel ' . app()->version())
             ->setUrl($name);
 
