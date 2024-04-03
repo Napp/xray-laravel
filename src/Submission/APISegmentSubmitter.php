@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Napp\Xray\Submission;
 
 use Aws\XRay\XRayClient;
+use Carbon\Carbon;
 use Pkerrigan\Xray\Segment;
 use Pkerrigan\Xray\Submission\SegmentSubmitter;
 
@@ -17,8 +18,9 @@ class APISegmentSubmitter implements SegmentSubmitter
 
     public function __construct()
     {
+
         $config = config('xray.aws');
-        $config['credentials']['expires'] = now()->addDay()->unix();
+        $config['credentials']['expires'] = Carbon::now()->addDay()->unix();
         $this->client = new XRayClient($config);
     }
 

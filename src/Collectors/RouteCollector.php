@@ -11,9 +11,14 @@ class RouteCollector extends EventsCollector
 {
     public function registerEventListeners(): void
     {
-        $this->app->booted(function () {
-            $this->addSegment('route matching');
-        });
+        if($this->app instanceof \Laravel\Lumen\Application){
+            $this->endSegment('laravel boot');
+        }
+        else{
+            $this->app->booted(function () {
+                $this->endSegment('laravel boot');
+            });
+        }
 
         // Time between route resolution and request handled
         $this->app['events']->listen(RouteMatched::class, function ($event) {

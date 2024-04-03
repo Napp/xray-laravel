@@ -15,8 +15,14 @@ class FrameworkCollector extends EventsCollector
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : microtime(true);
         $this->addSegment('laravel boot', $startTime);
 
-        $this->app->booted(function () {
-            $this->endSegment('laravel boot');
-        });
+        if($this->app instanceof \Laravel\Lumen\Application){
+                $this->endSegment('laravel boot');
+        }
+        else{
+            $this->app->booted(function () {
+                $this->endSegment('laravel boot');
+            });
+        }
+
     }
 }
