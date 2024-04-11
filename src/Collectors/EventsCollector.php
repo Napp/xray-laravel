@@ -8,7 +8,9 @@ use Illuminate\Foundation\Application;
 
 abstract class EventsCollector extends SegmentCollector
 {
-
+    /**
+     * @var \Illuminate\Foundation\Application
+     */
     protected $app;
     public function __construct()
     {
