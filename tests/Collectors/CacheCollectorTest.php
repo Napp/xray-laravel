@@ -29,7 +29,7 @@ class CacheCollectorTest extends TestCase
         };
 
         // and an event for this cacheCollectorMock
-        $givenEvent = new CacheHit("irrelevent", "irrelevent");
+        $givenEvent = new CacheHit("irrelevent", "irrelevent", "irrelevent");
 
         // when dispatching the event on the mock application
         $mockApplication->events->dispatch($givenEvent);
