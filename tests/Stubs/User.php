@@ -36,4 +36,9 @@ class User implements Authenticatable
     {
         return 'baz';
     }
+
+    public function getAuthPasswordName()
+    {
+        return 'password';
+    }
 }
