@@ -6,6 +6,7 @@ namespace Napp\Xray;
 
 use Illuminate\Support\ServiceProvider;
 use Napp\Xray\Collectors\CacheCollector;
+use Napp\Xray\Collectors\CommandCollector;
 use Napp\Xray\Collectors\DatabaseQueryCollector;
 use Napp\Xray\Collectors\FrameworkCollector;
 use Napp\Xray\Collectors\JobCollector;
@@ -63,6 +64,10 @@ class XrayServiceProvider extends ServiceProvider
 
         if (config('xray.job')) {
             app(JobCollector::class);
+        }
+
+        if (config('xray.command')) {
+            app(CommandCollector::class);
         }
 
         if (config('xray.view')) {
