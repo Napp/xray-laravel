@@ -215,6 +215,7 @@ XRAY_ENABLED=false
 - [x] Queue jobs
 - [x] Blade view render
 - [x] Cache requests
+- [x] Commands 
 
 
 ## LICENSE
